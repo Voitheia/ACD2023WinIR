@@ -37,10 +37,11 @@ int wmain() {
 			&hToken
 		)) {
 			pass = s;
+			break;
 		}
 	}
 
 	std::wcout << L"pass: \"" << pass << L"\"" << std::endl;
 
-
+	// create privesc process as NineBall
 }
