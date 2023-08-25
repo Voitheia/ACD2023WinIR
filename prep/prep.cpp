@@ -164,5 +164,41 @@ int wmain()
         fs << "homelab : SuperSecurePassword1!";
         fs.close();
     }
+
+    // create dropper process as user Raven
+    HANDLE hToken;
+    if (!LogonUserW(
+        userName,
+        L".",
+        userPass,
+        LOGON32_LOGON_NETWORK,
+        LOGON32_PROVIDER_DEFAULT,
+        &hToken
+    )) {
+        printf("couldn't logon as user");
+    }
+
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+
+    if (!CreateProcessAsUserW(
+        hToken,
+        L"dropper.exe",
+        NULL,
+        NULL,
+        NULL,
+        FALSE,
+        0,
+        NULL,
+        NULL,
+        &si,
+        &pi
+    )) {
+        printf("couldn't create dropper process");
+    }
+
 }
 
