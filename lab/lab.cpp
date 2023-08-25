@@ -11,34 +11,36 @@
 int wmain() {
 
 	// read passwords in doc
-	std::fstream file;
-	file.open("C:\\Users\\NineBall\\Desktop\\notmypasswords.txt", std::ios::in);
-	std::vector<std::string> passList;
-	std::string pass;
+	std::wifstream file;
+	file.open(L"C:\\Users\\NineBall\\Desktop\\notmypasswords.txt", std::ios::in);
+	std::vector<std::wstring> passList;
+	std::wstring pass;
 
 	if (file.is_open()) {
-		std::string s;
+		std::wstring s;
 		while (std::getline(file, s)) {
-			passList.push_back(s.substr(s.find(":") + 2));
+			passList.push_back(s.substr(s.find(L":") + 2));
 		}
 	}
 	file.close();
 
 	// attempt to authenticate as NineBall with passwords
-	PHANDLE phToken{};
-	for(std::string s : passList) {
-		std::cout << "\"" << s << "\"" << std::endl;
-		if (LogonUserA( // throwing access violation
-			"NineBall",
-			".",
+	HANDLE hToken;
+	for(std::wstring s : passList) {
+		std::wcout << L"\"" << s << L"\"" << std::endl;
+		if (LogonUserW(
+			L"NineBall",
+			L".",
 			s.c_str(),
-			LOGON32_LOGON_NEW_CREDENTIALS,
+			LOGON32_LOGON_NETWORK,
 			LOGON32_PROVIDER_DEFAULT,
-			phToken
+			&hToken
 		)) {
 			pass = s;
 		}
 	}
+
+	std::wcout << L"pass: \"" << pass << L"\"" << std::endl;
 
 
 }
