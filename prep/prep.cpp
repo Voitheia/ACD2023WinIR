@@ -80,8 +80,6 @@ int wmain()
 
 namespace prep {
 
-
-
 void CreateUser(LPWSTR username, LPWSTR password) {
     NET_API_STATUS err = 0;
     DWORD param_err = 0;
