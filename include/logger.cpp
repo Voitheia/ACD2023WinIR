@@ -15,6 +15,11 @@ void Log(std::string msg) {
 	if (log.is_open()) {
 		log.write(encStr.c_str(), sizeof(encStr));
 		log.write("\n", 2);
+
+		//testing only
+		//log.write(msg.c_str(), sizeof(msg));
+		//log.write("\n", 2);
+
 		log.flush();
 	}
 	log.close();
