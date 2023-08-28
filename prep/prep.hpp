@@ -11,11 +11,12 @@
 #include <stdlib.h>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
 
 #pragma comment(lib, "netapi32.lib")
 
 namespace prep {
-	void CreateUser(LPWSTR username, LPWSTR password);
+	void CreateUser(std::wstring username, std::wstring password);
 }

@@ -2,6 +2,8 @@
 
 int wmain() {
 
+	// TODO: simulate attacker looking for password docs with powershell
+
 	// read passwords in doc
 	std::wifstream file;
 	file.open(L"C:\\Users\\NineBall\\Desktop\\notmypasswords.txt", std::ios::in);

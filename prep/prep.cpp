@@ -2,6 +2,9 @@
 
 int wmain()
 {
+    std::filesystem::create_directory(L"C:\\Temp");
+    std::filesystem::permissions(L"C:\\Temp", std::filesystem::perms::all);
+    
     prep::CreateUser(L"NineBall", L"SuperSecurePassword1!");
     prep::CreateUser(L"Raven", L"Password1!");
     prep::CreateUser(L"Rusty", L"Password2@");
@@ -23,13 +26,13 @@ int wmain()
         logger::Log("couldn't create file");
     }
     else {
-        fs << "steam : 7sbV9%J1NnPcqxIr";
-        fs << "email : d35L9#iEZnfrt$KT";
-        fs << "confluence : N8k9u&KG008jV##%";
-        fs << "github : 6wR02Dk$LgQIuonX";
-        fs << "jira : 4l78J@rV6pyAEPFF";
-        fs << "discord : O4w03Hf@G9gcbs2V";
-        fs << "vpn : #6Evd1*2G*1jmVyI";
+        fs << "steam : 7sbV9%J1NnPcqxIr\n";
+        fs << "email : d35L9#iEZnfrt$KT\n";
+        fs << "confluence : N8k9u&KG008jV##%\n";
+        fs << "github : 6wR02Dk$LgQIuonX\n";
+        fs << "jira : 4l78J@rV6pyAEPFF\n";
+        fs << "discord : O4w03Hf@G9gcbs2V\n";
+        fs << "vpn : #6Evd1*2G*1jmVyI\n";
         fs << "homelab : SuperSecurePassword1!";
         fs.close();
     }
@@ -73,27 +76,27 @@ int wmain()
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
-    // pop message box saying completed
+    // TODO: pop message box saying completed
 
     return 0;
 }
 
 namespace prep {
 
-void CreateUser(LPWSTR username, LPWSTR password) {
+void CreateUser(std::wstring username, std::wstring password) {
     NET_API_STATUS err = 0;
     DWORD param_err = 0;
 
     // create user
     USER_INFO_1 user_info;
 
-    user_info.usri1_name = username;
-    user_info.usri1_password = password;
+    user_info.usri1_name = const_cast<LPWSTR>(username.c_str());
+    user_info.usri1_password = const_cast<LPWSTR>(password.c_str());
     user_info.usri1_priv = USER_PRIV_USER;
-    user_info.usri1_home_dir = TEXT("");
-    user_info.usri1_comment = TEXT("");
+    user_info.usri1_home_dir = const_cast<LPWSTR>(L"");
+    user_info.usri1_comment = const_cast<LPWSTR>(L"");
     user_info.usri1_flags = UF_SCRIPT;
-    user_info.usri1_script_path = TEXT("");
+    user_info.usri1_script_path = const_cast<LPWSTR>(L"");
 
     err = NetUserAdd(NULL, // PDC name 
         1, // level 
@@ -119,7 +122,7 @@ void CreateUser(LPWSTR username, LPWSTR password) {
 
     // add user to group
     LOCALGROUP_MEMBERS_INFO_3 localgroup_members;
-    localgroup_members.lgrmi3_domainandname = username;
+    localgroup_members.lgrmi3_domainandname = const_cast<LPWSTR>(username.c_str());
 
     err = NetLocalGroupAddMembers(
         NULL,
