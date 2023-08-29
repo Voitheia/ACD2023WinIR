@@ -8,19 +8,13 @@ std::mutex logMutex;
 char key[11] = { 'A','r','m','o','r','e','d','C','o','r','e' };
 
 void Log(std::string msg) {
-	std::string encStr = doXOR(PrependTime(msg));
+	std::string msgTime = PrependTime(msg); // testing only
+	std::string encStr = doXOR(msgTime);
 
 	std::lock_guard<std::mutex> guard(logMutex);
-	std::ofstream log(logFilePath, std::ios::binary);
+	std::ofstream log(logFilePath, std::ios::app);
 	if (log.is_open()) {
-		log.write(encStr.c_str(), sizeof(encStr));
-		log.write("\n", 2);
-
-		//testing only
-		//log.write(msg.c_str(), sizeof(msg));
-		//log.write("\n", 2);
-
-		log.flush();
+		log << encStr << std::endl;
 	}
 	log.close();
 }
