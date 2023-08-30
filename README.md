@@ -45,6 +45,7 @@ Emulate a backdoor listener
 ### 6. Listener
 Opens a socket on a port and listens. No actual functionality ‼️ **(TODO)**
 - considering having this component spawn netcat instead of just listening on a socket
+- prevent closing with API hooking on Terminate process and EndProcess
 
 ## Non-Executable Components
 
