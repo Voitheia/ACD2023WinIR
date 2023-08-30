@@ -1,32 +1,56 @@
 # ACD2023WinIR
 
 Code for the Active Cyber Defense class' Windows Incident Response lab.
-Simulates an insider threat adversary gaining complete control of a server and installing persistence.
-The code is divided into six portions:
+Simulates an insider threat adversary gaining complete control of a Windows server and installing persistence.
 
-## 1. Prep
-Performs actions to ensure the student's vm has necessary users and file for the lab.
+## Executable Components
+The code is divided into six executable components:
 
-## 2. Dropper
-Simulates the adversary's initial actions:
-- locate the password document
-- use those passwords with the admin account to find valid credentials
-- run malware with the admin's credentials
+### 1. Prep
+Performs actions to ensure the student's vm has necessary users and file for the lab. Required to be run as an administrator
+- Add new administrator user
+- Add multiple regular users
+- Create administrator password text document
+- Spawns the `dropper` with the threat actor user's credentials
 
-## 3. Privesc
-Uses token impersonation of a system process to obtain SYSTEM access.
+### 2. Dropper
+Simulates the adversary's initial actions to obtain admin access:
+- Locate the password document with a powershell command
+- Attempt to login to the administrator user's account using the passwords found to find valid credentials
+- Run the `privesc` with the admin's credentials
 
-## 4. Loader
+### 3. Privesc
+Uses token impersonation of a system process to obtain SYSTEM access, and then run the `loader` with that access.
+- Processes which we are able to obtain a SYSTEM token:
+  -  wininit.exe, smss.exe, services.exe, winlogon.exe, unsecapp.exe, csrss.exe, dllhost.exe, lsass.exe
+
+### 4. Loader
+Sink our teeth into the victim machine. Remove defenses and establish persistence
 - Disables Windows Defender through the registry
-- Installs `Persistence` as a service
+- Disables Windows Firewall through the registry
+- Create the working directory for the malware `C:\Windows\System32\Persistence\`
+- Drop `persistence` and `listener` components in the working directory
+- Create the malware config file
+- Hook `TerminateProcess`, `ExitProcess` and `ExitThread` to ensure that the `persistence` and `listener` stay active
+- Installs `persistence` as a service and configure the service
+- Run the persistence service
 
-## 5. Persistence
-- Spawns the listener and ensures that it is running
-- Injecs a second listener into a process and reinjects the listener if the initial host dies
-- Spawns a third listener and hides it from task manager with API hooking
+### 5. Persistence
+Emulate a backdoor listener
+- Spawns the listener and ensures that it is running (exe)
+- Injecs a second listener into a process and reinjects the listener if the initial host dies (dll)
 
-## 6. Listener
+### 6. Listener
 Opens a socket on a port and listens. No actual functionality
+- considering having this component spawn netcat instead of just listening on a socket
 
-## Logging
-Logs are created to ensure that the code is functioning properly. Logs are XOR'd to protect lab integrity (having logs would make the lab significantly easier)
+## Non-Executable Components
+
+### Logging
+Logs are created to ensure that the code functioned properly. Logs are XOR'd to protect lab integrity (having logs would make the lab significantly easier)
+
+### Admin password document
+List a few passwords that the administrator uses for other services, with one password that is reused for the administrator account
+
+### Config file
+Encoded with base 64. Give the students some hints to malware functionality. Not actually used by the malware.
