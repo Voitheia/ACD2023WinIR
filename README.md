@@ -58,8 +58,10 @@ List a few passwords that the administrator uses for other services, with one pa
 ### Config file
 Encoded with base 64. Give the students some hints to malware functionality. Not actually used by the malware.
 
+### `Build-Headers.ps1`
+Read an executable file's bytes and place them into an array of bytes in a header file
+
 ## TODO:
-1. implement embedding executable files
 1. pop message box when execution is complete
 1. add powershell command from dropper to scan for password documents
 1. disable windows firewall through registry from loader
