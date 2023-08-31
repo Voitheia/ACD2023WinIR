@@ -1,5 +1,9 @@
 add_executable(
 	privesc
 	"privesc.cpp"
-	"../include/logger.cpp"
+)
+
+target_link_libraries(
+	privesc
+	inc
 )

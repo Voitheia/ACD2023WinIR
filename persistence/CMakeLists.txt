@@ -1,5 +1,9 @@
 add_executable(
 	persistence
 	"persistence.cpp"
-	"../include/logger.cpp"
+)
+
+target_link_libraries(
+	persistence
+	inc
 )

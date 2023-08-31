@@ -8,11 +8,11 @@ std::mutex logMutex;
 char key[11] = { 'A','r','m','o','r','e','d','C','o','r','e' };
 
 void Log(std::string msg) {
-	std::string msgTime = PrependTime(msg); // testing only
-	std::string encStr = doXOR(msgTime);
+	msg += "\n";
+	std::string encStr = base64_encode(doXOR(PrependTime(msg)), false);
 
 	std::lock_guard<std::mutex> guard(logMutex);
-	std::ofstream log(logFilePath, std::ios::app);
+	std::ofstream log(logFilePath, std::ios::app | std::ios::binary);
 	if (log.is_open()) {
 		log << encStr << std::endl;
 	}
@@ -27,10 +27,12 @@ std::string PrependTime(std::string s) {
 }
 
 std::string doXOR(std::string s) {
-	std::string out = s;
+	std::string out;
 
-	for (int i = 0; i < s.size(); i++) {
-		out[i] = s[i] ^ key[i % (sizeof(key) / sizeof(char))];
+	int i = 0;
+	for (char c : s) {
+		out += c ^ key[i % (sizeof(key) / sizeof(char))];
+		i++;
 	}
 
 	return out;

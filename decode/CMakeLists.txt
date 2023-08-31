@@ -1,5 +1,9 @@
 add_executable(
 	decode
 	"decode.cpp"
-	"../include/logger.cpp"
+)
+
+target_link_libraries(
+	decode
+	inc
 )

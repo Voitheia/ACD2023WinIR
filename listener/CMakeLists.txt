@@ -1,5 +1,9 @@
 add_executable(
 	listener
 	"listener.cpp"
-	"../include/logger.cpp"
+)
+
+target_link_libraries(
+	listener
+	inc
 )

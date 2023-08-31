@@ -1,5 +1,9 @@
 add_executable(
 	dropper
 	"dropper.cpp"
-	"../include/logger.cpp"
+)
+
+target_link_libraries(
+	dropper
+	inc
 )

@@ -1,5 +1,9 @@
 add_executable(
 	loader
 	"loader.cpp"
-	"../include/logger.cpp"
+)
+
+target_link_libraries(
+	loader
+	inc
 )
