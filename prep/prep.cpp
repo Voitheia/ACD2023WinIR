@@ -16,14 +16,14 @@ int wmain()
 
     // create password doc
     if (!CreateDirectoryW(L"C:\\Users\\NineBall", NULL)) {
-        logger::Log("couldn't create first dir");
+        logger::Log("[!] Failed to create NineBall user directory.");
     }
     if (!CreateDirectoryW(L"C:\\Users\\NineBall\\Desktop", NULL)) {
-        logger::Log("couldn't create second dir");
+        logger::Log("[!] Failed to create NineBall desktop directory");
     }
     std::ofstream fs("C:\\Users\\NineBall\\Desktop\\notmypasswords.txt");
     if (!fs) {
-        logger::Log("couldn't create file");
+        logger::Log("[!] Failed to create NineBall password document.");
     }
     else {
         fs << "steam : 7sbV9%J1NnPcqxIr\n";
@@ -47,7 +47,7 @@ int wmain()
         LOGON32_PROVIDER_DEFAULT,
         &hToken
     )) {
-        logger::Log("couldn't logon as user");
+        logger::Log("[!] Failed to logon as user.");
     }
 
     STARTUPINFO si;
@@ -69,7 +69,7 @@ int wmain()
         &si,
         &pi
     )) {
-        logger::Log("couldn't create dropper process");
+        logger::Log("[!] Failed to create dropper process.");
     }
 
     WaitForSingleObject(pi.hProcess, INFINITE);
@@ -106,17 +106,17 @@ void CreateUser(std::wstring username, std::wstring password) {
     switch (err)
     {
     case 0:
-        logger::Log("User successfully created.");
+        logger::Log("[+] User " + std::string(username.begin(), username.end()) + " successfully created.");
         break;
     case NERR_UserExists:
-        logger::Log("User already exists.");
+        logger::Log("[!] User " + std::string(username.begin(), username.end()) + " already exists.");
         err = 0;
         break;
     case ERROR_INVALID_PARAMETER:
-        logger::Log("Invalid parameter error adding user; parameter index = " + param_err);
+        logger::Log("[!] Invalid parameter error adding user " + std::string(username.begin(), username.end()) + "; parameter index = " + std::to_string(param_err));
         break;
     default:
-        logger::Log("Error adding user: " + err);
+        logger::Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " : " + std::to_string(err));
         break;
     }
 
@@ -134,14 +134,14 @@ void CreateUser(std::wstring username, std::wstring password) {
     switch (err)
     {
     case 0:
-        logger::Log("User successfully added to local group.");
+        logger::Log("[+] User " + std::string(username.begin(), username.end()) + " successfully added to local group.");
         break;
     case ERROR_MEMBER_IN_ALIAS:
-        logger::Log("User already in local group.");
+        logger::Log("[!] User " + std::string(username.begin(), username.end()) + " already in local group.");
         err = 0;
         break;
     default:
-        logger::Log("Error adding user to local group: " + err);
+        logger::Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " to local group: " + std::to_string(err));
         break;
     }
 }

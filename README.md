@@ -50,7 +50,7 @@ Opens a socket on a port and listens. No actual functionality ‼️ **(TODO)**
 ## Non-Executable Components
 
 ### Logging
-Logs are created to ensure that the code functioned properly. Logs are XOR'd to protect lab integrity (having logs would make the lab significantly easier)
+Logs are created to ensure that the code functioned properly. Logs are base64 encoded XOR'd to protect lab integrity (having logs would make the lab significantly easier)
 
 ### Admin password document
 List a few passwords that the administrator uses for other services, with one password that is reused for the administrator account
