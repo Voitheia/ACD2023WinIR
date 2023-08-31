@@ -5,7 +5,7 @@ Simulates an insider threat adversary gaining complete control of a Windows serv
 
 ## Executable Components
 The code is divided into six executable components.
-Uses a nesting doll embedding approach so that the student only needs to run one executable ‼️ **(TODO)**.
+Uses a nesting doll embedding approach so that the student only needs to run one executable.
 The executable components are listed here in order of execution during the scenario:
 
 ### 1. Prep
@@ -17,7 +17,7 @@ Performs actions to ensure the student's vm has necessary users and file for the
 
 ### 2. Dropper
 Simulates the adversary's initial actions to obtain admin access:
-- Locate the password document with a powershell command ‼️ **(TODO)**
+- Locate the password document with a powershell command
 - Attempt to login to the administrator user's account using the passwords found to find valid credentials
 - Run the `privesc` with the admin's credentials
 
@@ -29,21 +29,21 @@ Uses token impersonation of a system process to obtain SYSTEM access, and then r
 ### 4. Loader
 Sink our teeth into the victim machine. Remove defenses and establish persistence
 - Disables Windows Defender through the registry
-- Disables Windows Firewall through the registry ‼️ **(TODO)**
-- Create the working directory for the malware `C:\Windows\System32\Persistence\` ‼️ **(TODO)**
-- Drop `persistence` and `listener` components in the working directory ‼️ **(TODO)**
-- Create the malware config file ‼️ **(TODO)**
-- Hook `TerminateProcess`, `ExitProcess` and `ExitThread` to ensure that the `persistence` and `listener` stay active ‼️ **(TODO)**
+- Disables Windows Firewall through the registry
+- Create the working directory for the malware `C:\Windows\System32\Persistence\`
+- Drop `persistence` and `listener` components in the working directory
+- Create the malware config file
+- Hook `TerminateProcess`, `ExitProcess` and `ExitThread` to ensure that the `persistence` and `listener` stay active
 - Installs `persistence` as a service and configure the service
-- Run the persistence service ‼️ **(TODO)**
+- Run the persistence service
 
 ### 5. Persistence
 Emulate a backdoor listener
-- Spawns the listener and ensures that it is running (exe) ‼️ **(TODO)**
-- Injecs a second listener into a process and reinjects the listener if the initial host dies (dll) ‼️ **(TODO)**
+- Spawns the listener and ensures that it is running (exe)
+- Injecs a second listener into a process and reinjects the listener if the initial host dies (dll)
 
 ### 6. Listener
-Opens a socket on a port and listens. No actual functionality ‼️ **(TODO)**
+Opens a socket on a port and listens. No actual functionality
 - considering having this component spawn netcat instead of just listening on a socket
 - prevent closing with API hooking on Terminate process and EndProcess
 
@@ -55,7 +55,7 @@ Logs are created to ensure that the code functioned properly. Logs are base64 en
 ### Admin password document
 List a few passwords that the administrator uses for other services, with one password that is reused for the administrator account
 
-### Config file ‼️ **(TODO)**
+### Config file
 Encoded with base 64. Give the students some hints to malware functionality. Not actually used by the malware.
 
 ## TODO:
