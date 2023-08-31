@@ -57,3 +57,18 @@ List a few passwords that the administrator uses for other services, with one pa
 
 ### Config file ‼️ **(TODO)**
 Encoded with base 64. Give the students some hints to malware functionality. Not actually used by the malware.
+
+## TODO:
+1. implement embedding executable files
+1. pop message box when execution is complete
+1. add powershell command from dropper to scan for password documents
+1. disable windows firewall through registry from loader
+1. create working directory
+1. drop persistence asnd listener to working directory
+1. create config file
+1. hook TerminateProcess, ExitProcess
+1. run persistence service
+1. spawn listener from persistence
+1. inject a listener into a process and monitor host
+1. listener open socket
+1. (stretch) investigate having listener run netcat, potentially self inject
