@@ -4,7 +4,3 @@
 
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
-
-namespace persistence {
-
-}

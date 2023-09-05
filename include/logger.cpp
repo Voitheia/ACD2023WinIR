@@ -1,13 +1,14 @@
 #include "logger.hpp"
 
-namespace logger {
-
-std::wstring logFileName = L"lab6logs.txt";
-std::wstring logFilePath = L"C:\\Temp\\" + logFileName;
+std::string logFileName = "lab6logs";
+std::string logFileExt = ".txt";
+std::string logFileDir = "C:\\Temp\\";
 std::mutex logMutex;
 char key[11] = { 'A','r','m','o','r','e','d','C','o','r','e' };
 
-void Log(std::string msg) {
+void Log(std::string msg, std::string caller) {
+	std::string logFilePath = logFileDir + logFileName + caller + logFileExt;
+
 	msg += "\n";
 	std::string encStr = base64_encode(doXOR(PrependTime(msg)), false);
 
@@ -36,6 +37,4 @@ std::string doXOR(std::string s) {
 	}
 
 	return out;
-}
-
 }

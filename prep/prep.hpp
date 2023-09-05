@@ -18,6 +18,4 @@
 
 #pragma comment(lib, "netapi32.lib")
 
-namespace prep {
-	void CreateUser(std::wstring username, std::wstring password);
-}
+void CreateUser(std::wstring username, std::wstring password);

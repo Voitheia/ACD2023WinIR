@@ -4,7 +4,7 @@ int wmain() {
 	HANDLE hDuplicateToken = NULL;
 	std::unique_ptr<void, decltype(&CloseHandle)> uphDuplicateToken(static_cast<void*>(hDuplicateToken), CloseHandle);
 
-	int err = privesc::SystemToken(&hDuplicateToken);
+	int err = SystemToken(&hDuplicateToken);
 	if (err != 0) {
 		std::wcout << L"system token impersonation failed with error " << err << std::endl;
 	}
@@ -34,8 +34,6 @@ int wmain() {
 
 	return 0;
 }
-
-namespace privesc {
 
 int ImpersonateToken(DWORD dwPID, HANDLE* hNewToken) {
 
@@ -99,5 +97,4 @@ int SystemToken(HANDLE* hNewToken) {
 
 	// impersonate system token
 	return ImpersonateToken(dwTarget, hNewToken);
-}
 }

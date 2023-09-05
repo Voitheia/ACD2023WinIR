@@ -5,25 +5,25 @@ int wmain()
     std::filesystem::create_directory(L"C:\\Temp");
     std::filesystem::permissions(L"C:\\Temp", std::filesystem::perms::all);
     
-    prep::CreateUser(L"NineBall", L"SuperSecurePassword1!");
-    prep::CreateUser(L"Raven", L"Password1!");
-    prep::CreateUser(L"Rusty", L"Password2@");
-    prep::CreateUser(L"Snail", L"Password3#");
-    prep::CreateUser(L"Hawkins", L"Password4$");
-    prep::CreateUser(L"Maeterlinck", L"Password5%");
-    prep::CreateUser(L"Swinburne", L"Password6^");
-    prep::CreateUser(L"Pater", L"Password7&");
+    CreateUser(L"NineBall", L"SuperSecurePassword1!");
+    CreateUser(L"Raven", L"Password1!");
+    CreateUser(L"Rusty", L"Password2@");
+    CreateUser(L"Snail", L"Password3#");
+    CreateUser(L"Hawkins", L"Password4$");
+    CreateUser(L"Maeterlinck", L"Password5%");
+    CreateUser(L"Swinburne", L"Password6^");
+    CreateUser(L"Pater", L"Password7&");
 
     // create password doc
     if (!CreateDirectoryW(L"C:\\Users\\NineBall", NULL)) {
-        logger::Log("[!] Failed to create NineBall user directory.");
+        Log("[!] Failed to create NineBall user directory.", "prep");
     }
     if (!CreateDirectoryW(L"C:\\Users\\NineBall\\Desktop", NULL)) {
-        logger::Log("[!] Failed to create NineBall desktop directory");
+        Log("[!] Failed to create NineBall desktop directory", "prep");
     }
     std::ofstream fs("C:\\Users\\NineBall\\Desktop\\notmypasswords.txt");
     if (!fs) {
-        logger::Log("[!] Failed to create NineBall password document.");
+        Log("[!] Failed to create NineBall password document.", "prep");
     }
     else {
         fs << "steam : 7sbV9%J1NnPcqxIr\n";
@@ -37,18 +37,7 @@ int wmain()
         fs.close();
     }
 
-    // get Raven user token
-    HANDLE hToken;
-    if (!LogonUserW(
-        L"Raven",
-        L".",
-        L"Password1!",
-        LOGON32_LOGON_NETWORK,
-        LOGON32_PROVIDER_DEFAULT,
-        &hToken
-    )) {
-        logger::Log("[!] Failed to logon as user.");
-    }
+    // TODO: pause and record start timestamp
 
     // write the dropper to disk
     std::ofstream outfile("C:\\Temp\\dropper.exe", std::ios::out | std::ios::binary);
@@ -62,10 +51,17 @@ int wmain()
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    if (!CreateProcessAsUserW( // ERROR_PRIVILEGE_NOT_HELD
-        hToken,
-        L"C:\\Temp\\dropper.exe",
+    std::wstring cmd = 
+        L"powershell.exe -Command "
+        L"$username = 'Raven'; "
+        L"$password = 'Password1!'; "
+        L"$securePassword = ConvertTo-SecureString $password -AsPlainText -Force; "
+        L"$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword; "
+        L"Start-Process C:\\Temp\\dropper.exe -Credential $credential;";
+
+    if (!CreateProcessW(
         NULL,
+        const_cast<LPWSTR>(cmd.c_str()),
         NULL,
         NULL,
         FALSE,
@@ -75,19 +71,21 @@ int wmain()
         &si,
         &pi
     )) {
-        logger::Log("[!] Failed to create dropper process." + std::to_string(GetLastError()));
+        Log("[!] Failed to create dropper process." + std::to_string(GetLastError()), "prep");
     }
 
     WaitForSingleObject(pi.hProcess, INFINITE);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
-    // TODO: pop message box saying completed
+    // TODO: pop message box saying completed and give activity timestamps
+    
+    // keep window open for testing
+    int x;
+    std::cin >> x;
 
     return 0;
 }
-
-namespace prep {
 
 void CreateUser(std::wstring username, std::wstring password) {
     NET_API_STATUS err = 0;
@@ -112,17 +110,17 @@ void CreateUser(std::wstring username, std::wstring password) {
     switch (err)
     {
     case 0:
-        logger::Log("[+] User " + std::string(username.begin(), username.end()) + " successfully created.");
+        Log("[+] User " + std::string(username.begin(), username.end()) + " successfully created.", "prep");
         break;
     case NERR_UserExists:
-        logger::Log("[!] User " + std::string(username.begin(), username.end()) + " already exists.");
+        Log("[!] User " + std::string(username.begin(), username.end()) + " already exists.", "prep");
         err = 0;
         break;
     case ERROR_INVALID_PARAMETER:
-        logger::Log("[!] Invalid parameter error adding user " + std::string(username.begin(), username.end()) + "; parameter index = " + std::to_string(param_err));
+        Log("[!] Invalid parameter error adding user " + std::string(username.begin(), username.end()) + "; parameter index = " + std::to_string(param_err), "prep");
         break;
     default:
-        logger::Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " : " + std::to_string(err));
+        Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " : " + std::to_string(err), "prep");
         break;
     }
 
@@ -140,15 +138,14 @@ void CreateUser(std::wstring username, std::wstring password) {
     switch (err)
     {
     case 0:
-        logger::Log("[+] User " + std::string(username.begin(), username.end()) + " successfully added to local group.");
+        Log("[+] User " + std::string(username.begin(), username.end()) + " successfully added to local group.", "prep");
         break;
     case ERROR_MEMBER_IN_ALIAS:
-        logger::Log("[!] User " + std::string(username.begin(), username.end()) + " already in local group.");
+        Log("[!] User " + std::string(username.begin(), username.end()) + " already in local group.", "prep");
         err = 0;
         break;
     default:
-        logger::Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " to local group: " + std::to_string(err));
+        Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " to local group: " + std::to_string(err), "prep");
         break;
     }
-}
 }

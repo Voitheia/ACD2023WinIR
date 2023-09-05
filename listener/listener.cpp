@@ -3,7 +3,3 @@
 int wmain() {
 	return 0;
 }
-
-namespace listener {
-
-}

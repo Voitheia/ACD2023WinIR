@@ -9,7 +9,4 @@
 #include <string>
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
-
-namespace dropper {
-
-}
+#include "..\privesc\embed.hpp"

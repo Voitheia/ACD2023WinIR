@@ -11,7 +11,5 @@
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
 
-namespace privesc {
-	int ImpersonateToken(DWORD dwPID, HANDLE* hNewToken);
-	int SystemToken(HANDLE* hNewToken);
-}
+int ImpersonateToken(DWORD dwPID, HANDLE* hNewToken);
+int SystemToken(HANDLE* hNewToken);
