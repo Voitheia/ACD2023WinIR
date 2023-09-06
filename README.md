@@ -61,6 +61,22 @@ Encoded with base 64. Give the students some hints to malware functionality. Not
 ### `Build-Headers.ps1`
 Read an executable file's bytes and place them into an array of bytes in a header file
 
+### Remote Debugging
+1. Enter Solution Explorer in VS
+1. Go to CMake Targets View
+1. Open the project dropdown
+1. Right click on `prep` and select "Add debug configuration"
+1. Add/modify the following:
+```
+"configurations": [
+    {
+      "type": "remoteWindows",
+      "remoteMachineName": "<IP ADDRESS>",
+      "authenticationType": "windows"
+    }
+  ]
+```
+
 ## TODO:
 1. pop message box when execution is complete
 1. add powershell command from dropper to scan for password documents

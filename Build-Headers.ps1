@@ -49,7 +49,7 @@ function Create-Header {
 extern const char $Name[] = {
 	$hexStr
 };
-#pragma warening ( pop )"
+#pragma warning ( pop )"
 
 		Set-Location -Path "../../../"
 		$OutPath = "./$Name/embed.hpp"
