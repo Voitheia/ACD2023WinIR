@@ -8,7 +8,7 @@ project (
 	DESCRIPTION "UMBC Active Cyber Defense 2023 Windows LR Lab"
 )
 
-execute_process(COMMAND powershell -ExecutionPolicy Bypass -File "${PROJECT_SOURCE_DIR}/Build-Headers.ps1")
+#execute_process(COMMAND powershell -ExecutionPolicy Bypass -File "${PROJECT_SOURCE_DIR}/Build-Header.ps1 -name listener")
 
 add_subdirectory("prep")
 add_subdirectory("dropper")
