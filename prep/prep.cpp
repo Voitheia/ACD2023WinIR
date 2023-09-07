@@ -16,10 +16,10 @@ int wmain()
 
     // create password doc
     if (!CreateDirectoryW(L"C:\\Users\\NineBall", NULL)) {
-        Log("[!] Failed to create NineBall user directory.", "prep");
+        Log("[!] Failed to create NineBall user directory." + std::to_string(GetLastError()), "prep");
     }
     if (!CreateDirectoryW(L"C:\\Users\\NineBall\\Desktop", NULL)) {
-        Log("[!] Failed to create NineBall desktop directory", "prep");
+        Log("[!] Failed to create NineBall desktop directory" + std::to_string(GetLastError()), "prep");
     }
     std::ofstream fs("C:\\Users\\NineBall\\Desktop\\notmypasswords.txt");
     if (!fs) {

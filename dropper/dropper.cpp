@@ -39,7 +39,7 @@ int wmain() {
 	}
 
 	if (hToken == NULL || hToken == INVALID_HANDLE_VALUE) {
-		Log("[!] Failed to get NineBall token", "dropper");
+		Log("[!] Failed to get NineBall token" + std::to_string(GetLastError()), "dropper");
 	}
 
 	Log("[*] Valid password: \"" + pass + "\"", "dropper");
