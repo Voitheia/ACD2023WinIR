@@ -39,12 +39,15 @@ int wmain()
 
     // TODO: pause and record start timestamp
 
+
     // write the dropper to disk
+    Log("[+] Dropping dropper to disk.", "prep");
     std::ofstream outfile("C:\\Temp\\dropper.exe", std::ios::out | std::ios::binary);
-    outfile.write(&dropper[0], sizeof(dropper));
+    outfile.write(&dropper[0], sizeof(dropper)); // try catch?
     outfile.close();
 
     // create dropper process as user Raven
+    Log("[+] Creating dropper process as Raven.", "prep");
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
@@ -72,6 +75,9 @@ int wmain()
         &pi
     )) {
         Log("[!] Failed to create dropper process." + std::to_string(GetLastError()), "prep");
+    }
+    else {
+        Log("[+] Powershell process spawned.", "prep");
     }
 
     WaitForSingleObject(pi.hProcess, INFINITE);

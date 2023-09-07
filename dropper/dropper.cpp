@@ -1,6 +1,7 @@
 #include "dropper.hpp"
 
 int wmain() {
+	Log("[+] Starting dropper.", "dropper");
 
 	// TODO: simulate attacker looking for password docs with powershell
 
@@ -80,6 +81,10 @@ int wmain() {
 	WaitForSingleObject(pi.hProcess, INFINITE);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
+
+	// keep window open for testing
+	int x;
+	std::cin >> x;
 
 	return 0;
 }

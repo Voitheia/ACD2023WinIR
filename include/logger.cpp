@@ -5,8 +5,14 @@ std::string logFileExt = ".txt";
 std::string logFileDir = "C:\\Temp\\";
 std::mutex logMutex;
 char key[11] = { 'A','r','m','o','r','e','d','C','o','r','e' };
+bool logging = false;
 
 void Log(std::string msg, std::string caller) {
+	if (!logging) {
+		std::cout << PrependTime(msg) << std::endl;
+		return;
+	}
+
 	std::string logFilePath = logFileDir + logFileName + caller + logFileExt;
 
 	msg += "\n";
