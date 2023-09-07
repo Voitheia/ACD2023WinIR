@@ -78,6 +78,7 @@ Read an executable file's bytes and place them into an array of bytes in a heade
 ```
 
 ## TODO:
+1. add whoami or equivalent at beginning of dropper, privesc, loader
 1. pop message box when execution is complete
 1. add powershell command from dropper to scan for password documents
 1. disable windows firewall through registry from loader

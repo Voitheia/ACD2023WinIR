@@ -9,6 +9,7 @@
 #include <winsvc.h>
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
+#include "..\include\util.hpp"
 
 HKEY HKLM = HKEY_LOCAL_MACHINE;
 std::map<LPCWSTR, std::map<LPCWSTR, DWORD>> registryEntries = {

