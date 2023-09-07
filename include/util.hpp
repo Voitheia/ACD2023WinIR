@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include <memory>
 #include <string>
+#include "logger.hpp"
 
-int GetUserRunningProcess(std::string* user);
-std::string UserRunningProcess();
+std::string RunWhoami();

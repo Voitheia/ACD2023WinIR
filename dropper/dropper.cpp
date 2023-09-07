@@ -4,7 +4,7 @@ std::string componentName = "dropper";
 
 int wmain() {
 	Log("[+] Starting " + componentName + ".", componentName);
-	Log("[*] Running as " + UserRunningProcess(), componentName);
+	Log("[*] Running as " + RunWhoami(), componentName);
 
 	// TODO: simulate attacker looking for password docs with powershell
 
@@ -91,10 +91,6 @@ int wmain() {
 	WaitForSingleObject(pi.hProcess, INFINITE);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
-
-	// keep window open for testing
-	int x;
-	std::cin >> x;
 
 	return 0;
 }
