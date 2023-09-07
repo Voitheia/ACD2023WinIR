@@ -5,7 +5,8 @@ std::string logFileExt = ".txt";
 std::string logFileDir = "C:\\Temp\\";
 std::mutex logMutex;
 char key[11] = { 'A','r','m','o','r','e','d','C','o','r','e' };
-bool logging = false;
+bool logging = true;
+bool encode = false;
 
 void Log(std::string msg, std::string caller) {
 	if (!logging) {
@@ -16,7 +17,7 @@ void Log(std::string msg, std::string caller) {
 	std::string logFilePath = logFileDir + logFileName + caller + logFileExt;
 
 	msg += "\n";
-	std::string encStr = base64_encode(doXOR(PrependTime(msg)), false);
+	std::string encStr = encode ? base64_encode(doXOR(PrependTime(msg)), false) : PrependTime(msg);
 
 	std::lock_guard<std::mutex> guard(logMutex);
 	std::ofstream log(logFilePath, std::ios::app | std::ios::binary);

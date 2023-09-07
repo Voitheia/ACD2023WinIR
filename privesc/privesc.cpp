@@ -37,6 +37,10 @@ int wmain() {
 		Log("[+] Successfully spawned loader", "privesc");
 	}
 
+	// keep window open for testing
+	int x;
+	std::cin >> x;
+
 	return 0;
 }
 
