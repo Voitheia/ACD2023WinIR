@@ -53,7 +53,7 @@ std::string RunWhoami() {
 
 	bSuccess = CreateProcessW(
 		NULL,
-		(LPWSTR)cmdline.c_str(),
+		const_cast<LPWSTR>(cmdline.c_str()),
 		NULL,
 		NULL,
 		TRUE,

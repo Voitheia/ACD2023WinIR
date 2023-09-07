@@ -10,6 +10,7 @@ project (
 
 add_subdirectory("prep")
 add_subdirectory("dropper")
+add_subdirectory("elevate")
 add_subdirectory("privesc")
 add_subdirectory("loader")
 add_subdirectory("persistence")

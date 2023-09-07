@@ -11,6 +11,7 @@
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
 #include "..\include\util.hpp"
+#include "..\loader\embed.hpp"
 
 int ImpersonateToken(DWORD dwPID, HANDLE* hNewToken);
 int SystemToken(HANDLE* hNewToken);

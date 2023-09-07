@@ -4,7 +4,7 @@ Code for the Active Cyber Defense class' Windows Incident Response lab.
 Simulates an insider threat adversary gaining complete control of a Windows server and installing persistence.
 
 ## Executable Components
-The code is divided into six executable components.
+The code is divided into seven executable components.
 Uses a nesting doll embedding approach so that the student only needs to run one executable.
 The executable components are listed here in order of execution during the scenario:
 
@@ -21,12 +21,15 @@ Simulates the adversary's initial actions to obtain admin access:
 - Attempt to login to the administrator user's account using the passwords found to find valid credentials
 - Run the `privesc` with the admin's credentials
 
-### 3. Privesc
+### 3. Elevate
+Spawn an elevated process as the administrator
+
+### 4. Privesc
 Uses token impersonation of a system process to obtain SYSTEM access, and then run the `loader` with that access.
 - Processes which we are able to obtain a SYSTEM token:
   -  wininit.exe, smss.exe, services.exe, winlogon.exe, unsecapp.exe, csrss.exe, dllhost.exe, lsass.exe
 
-### 4. Loader
+### 5. Loader
 Sink our teeth into the victim machine. Remove defenses and establish persistence
 - Disables Windows Defender through the registry
 - Disables Windows Firewall through the registry
@@ -37,12 +40,12 @@ Sink our teeth into the victim machine. Remove defenses and establish persistenc
 - Installs `persistence` as a service and configure the service
 - Run the persistence service
 
-### 5. Persistence
+### 6. Persistence
 Emulate a backdoor listener
 - Spawns the listener and ensures that it is running (exe)
 - Injecs a second listener into a process and reinjects the listener if the initial host dies (dll)
 
-### 6. Listener
+### 7. Listener
 Opens a socket on a port and listens. No actual functionality
 - considering having this component spawn netcat instead of just listening on a socket
 - prevent closing with API hooking on Terminate process and EndProcess

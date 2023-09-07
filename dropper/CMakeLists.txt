@@ -10,7 +10,7 @@ target_link_libraries(
 
 add_dependencies(
 	dropper
-	privesc
+	elevate
 )
 
 add_custom_command(
