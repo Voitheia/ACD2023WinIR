@@ -3,7 +3,7 @@
 std::string utilComponentName = "util";
 
 std::string RunWhoami() {
-	// https://learn.microsoft.com/en-us/windows/win32/procthread/creating-a-child-process-with-redirected-input-and-output
+	// source: https://learn.microsoft.com/en-us/windows/win32/procthread/creating-a-child-process-with-redirected-input-and-output
 
 	std::string retStr = "";
 
@@ -72,6 +72,7 @@ std::string RunWhoami() {
 		CloseHandle(piProcInfo.hThread);
 		CloseHandle(g_hChildStd_OUT_Wr);
 		CloseHandle(g_hChildStd_IN_Rd);
+		Log("[+] Successfully created RunWhoami powershell process.", utilComponentName);
 	}
 
 	Sleep(500);

