@@ -11,3 +11,7 @@
 #include "..\include\header.hpp"
 #include "..\include\util.hpp"
 #include "..\elevate\embed.hpp"
+
+void SearchForPass();
+void GetCreds();
+void Elevate();

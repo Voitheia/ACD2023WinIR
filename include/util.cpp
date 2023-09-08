@@ -92,6 +92,9 @@ std::string RunWhoami() {
 
 	retStr = std::string(chBuf);
 
+	CloseHandle(g_hChildStd_IN_Wr);
+	CloseHandle(g_hChildStd_OUT_Rd);
+
 	return retStr;
 }
 
@@ -115,16 +118,16 @@ std::string RunWhoamiGroups() {
 	saAttr.lpSecurityDescriptor = NULL;
 
 	if (!CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0))
-		Log("[!] RunWhoami StdoutRd CreatePipe: " + std::to_string(GetLastError()), utilComponentName);
+		Log("[!] RunWhoamiGroups StdoutRd CreatePipe: " + std::to_string(GetLastError()), utilComponentName);
 
 	if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0))
-		Log("[!] RunWhoami Stdout SetHandleInformation: " + std::to_string(GetLastError()), utilComponentName);
+		Log("[!] RunWhoamiGroups Stdout SetHandleInformation: " + std::to_string(GetLastError()), utilComponentName);
 
 	if (!CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0))
-		Log("[!] RunWhoami Stdin CreatePipe: " + std::to_string(GetLastError()), utilComponentName);
+		Log("[!] RunWhoamiGroups Stdin CreatePipe: " + std::to_string(GetLastError()), utilComponentName);
 
 	if (!SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0))
-		Log("[!] RunWhoami Stdin SetHandleInformation: " + std::to_string(GetLastError()), utilComponentName);
+		Log("[!] RunWhoamiGroups Stdin SetHandleInformation: " + std::to_string(GetLastError()), utilComponentName);
 
 	PROCESS_INFORMATION piProcInfo;
 	STARTUPINFOW siStartInfo;
@@ -181,11 +184,28 @@ std::string RunWhoamiGroups() {
 
 	retStr = std::string(chBuf);
 
-	size_t pos = retStr.find("Mandatory Label\\");
-	if (pos == std::string::npos) {
-		Log("[!] Error extracting context", utilComponentName);
-		return retStr;
-	}
+	//size_t pos = retStr.find("Mandatory Label\\");
+	//if (pos == std::string::npos) {
+	//	Log("[!] Error extracting context", utilComponentName);
+	//	return retStr;
+	//}
 
-	return retStr.substr(pos);
+	//std::string context = retStr.substr(pos);
+
+	//return context;
+
+	CloseHandle(g_hChildStd_IN_Wr);
+	CloseHandle(g_hChildStd_OUT_Rd);
+
+	if (retStr.find("Low Mandatory Level") != std::string::npos)
+		return "Low Mandatory Level";
+
+	if (retStr.find("Medium Mandatory Level") != std::string::npos)
+		return "Medium Mandatory Level";
+
+	if (retStr.find("High Mandatory Level") != std::string::npos)
+		return "High Mandatory Level";
+
+	Log("[!] Error extracting context", utilComponentName);
+	return "";
 }

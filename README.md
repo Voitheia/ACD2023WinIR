@@ -10,6 +10,7 @@ The executable components are listed here in order of execution during the scena
 
 ### 1. Prep
 Performs actions to ensure the student's vm has necessary users and file for the lab. Required to be run as an administrator
+- Create `C:\Temp` folder
 - Add new administrator user
 - Add multiple regular users
 - Create administrator password text document
@@ -19,14 +20,14 @@ Performs actions to ensure the student's vm has necessary users and file for the
 Simulates the adversary's initial actions to obtain admin access:
 - Locate the password document with a powershell command
 - Attempt to login to the administrator user's account using the passwords found to find valid credentials
-- Run the `privesc` with the admin's credentials
+- Run the `elevate` with the admin's credentials
 
 ### 3. Elevate
-Spawn an elevated process as the administrator
+Spawn `privesc` in a high integrity context using [fodhelper UAC bypass](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1548.002/T1548.002.md#atomic-test-4---bypass-uac-using-fodhelper---powershell)
 
 ### 4. Privesc
 Uses token impersonation of a system process to obtain SYSTEM access, and then run the `loader` with that access.
-- Processes which we are able to obtain a SYSTEM token:
+- Processes which we are able to obtain a SYSTEM token from:
   -  wininit.exe, smss.exe, services.exe, winlogon.exe, unsecapp.exe, csrss.exe, dllhost.exe, lsass.exe
 
 ### 5. Loader
@@ -41,7 +42,7 @@ Sink our teeth into the victim machine. Remove defenses and establish persistenc
 - Run the persistence service
 
 ### 6. Persistence
-Emulate a backdoor listener
+Ensure listener stays open, start on boot
 - Spawns the listener and ensures that it is running (exe)
 - Injecs a second listener into a process and reinjects the listener if the initial host dies (dll)
 
@@ -56,13 +57,13 @@ Opens a socket on a port and listens. No actual functionality
 Logs are created to ensure that the code functioned properly. Logs are base64 encoded XOR'd to protect lab integrity (having logs would make the lab significantly easier)
 
 ### Admin password document
-List a few passwords that the administrator uses for other services, with one password that is reused for the administrator account
+Lists a few passwords that the administrator uses for other services, with one password that is reused for the administrator account
 
 ### Config file
 Encoded with base 64. Give the students some hints to malware functionality. Not actually used by the malware.
 
-### `Build-Headers.ps1`
-Read an executable file's bytes and place them into an array of bytes in a header file
+### `Build-Header.ps1`
+Read an executable file's bytes and place them into an array of bytes in a header file.
 
 ### Remote Debugging
 1. Enter Solution Explorer in VS
@@ -81,10 +82,7 @@ Read an executable file's bytes and place them into an array of bytes in a heade
 ```
 
 ## TODO:
-1. get logging to a single file working
 1. pop message box when execution is complete
-1. add powershell command from dropper to scan for password documents
-1. disable windows firewall through registry from loader
 1. create working directory
 1. drop persistence asnd listener to working directory
 1. create config file
@@ -92,5 +90,6 @@ Read an executable file's bytes and place them into an array of bytes in a heade
 1. spawn listener from persistence
 1. inject a listener into a process and monitor host
 1. listener open socket
+1. (stretch) get logging to a single file working
 1. (stretch) hook TerminateProcess, ExitProcess
 1. (stretch) investigate having listener run netcat, potentially self inject

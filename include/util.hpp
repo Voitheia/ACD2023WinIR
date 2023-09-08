@@ -4,3 +4,5 @@
 #include "logger.hpp"
 
 std::string GetUserAndContext();
+std::string RunWhoami();
+std::string RunWhoamiGroups();
