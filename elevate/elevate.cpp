@@ -4,7 +4,7 @@ std::string componentName = "elevate";
 
 int wmain() {
 	Log("[+] Starting " + componentName + ".", componentName);
-	Log("[*] Running as " + RunWhoami(), componentName);
+	Log("[*] Running as " + GetUserAndContext(), componentName);
 
 	// drop privesc to disk
 	Log("[+] Writing privesc to disk.", componentName);

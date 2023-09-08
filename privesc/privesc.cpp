@@ -4,7 +4,7 @@ std::string componentName = "privesc";
 
 int wmain() {
 	Log("[+] Starting " + componentName + ".", componentName);
-	Log("[*] Running as " + RunWhoami(), componentName);
+	Log("[*] Running as " + GetUserAndContext(), componentName);
 	Log("[+] Beginning token impersonation.", componentName);
 
 	HANDLE hDuplicateToken = NULL;

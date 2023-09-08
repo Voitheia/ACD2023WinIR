@@ -81,7 +81,6 @@ Read an executable file's bytes and place them into an array of bytes in a heade
 ```
 
 ## TODO:
-1. add whoami or equivalent at beginning of dropper, privesc, loader
 1. get logging to a single file working
 1. pop message box when execution is complete
 1. add powershell command from dropper to scan for password documents
@@ -89,9 +88,9 @@ Read an executable file's bytes and place them into an array of bytes in a heade
 1. create working directory
 1. drop persistence asnd listener to working directory
 1. create config file
-1. hook TerminateProcess, ExitProcess
 1. run persistence service
 1. spawn listener from persistence
 1. inject a listener into a process and monitor host
 1. listener open socket
+1. (stretch) hook TerminateProcess, ExitProcess
 1. (stretch) investigate having listener run netcat, potentially self inject

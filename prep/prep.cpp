@@ -16,7 +16,7 @@ int wmain()
     //std::filesystem::permissions("C:\\Temp\\lab6logs.txt", std::filesystem::perms::all);
     
     Log("[+] Starting " + componentName + ".", componentName);
-    Log("[*] Running as " + RunWhoami(), componentName);
+    Log("[*] Running as " + GetUserAndContext(), componentName);
     
     CreateUser(L"NineBall", L"SuperSecurePassword1!");
     CreateUser(L"Raven", L"Password1!");
