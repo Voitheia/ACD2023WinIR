@@ -6,7 +6,17 @@ int wmain() {
 	Log("[+] Starting " + componentName + ".", componentName);
 	Log("[*] Running as " + GetUserAndContext(), componentName);
 
-	// TODO: simulate attacker looking for password docs with powershell
+	SearchForPass();
+
+	GetCreds();
+
+	Elevate();
+
+	return 0;
+}
+
+void SearchForPass() {
+	// simulate attacker looking for password docs with powershell
 	Log("[*] Searching for password doc", componentName);
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -38,7 +48,9 @@ int wmain() {
 	WaitForSingleObject(pi.hProcess, INFINITE);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
+}
 
+void GetCreds() {
 	// read passwords in doc
 	Log("[+] Reading password doc.", componentName);
 	std::ifstream file;
@@ -77,7 +89,9 @@ int wmain() {
 	}
 
 	Log("[*] Valid password: \"" + pass + "\"", componentName);
+}
 
+void Elevate() {
 	// write elevate to disk
 	Log("[+] Writing elevate to disk.", componentName);
 	std::ofstream outfile("C:\\Temp\\elevate.exe", std::ios::out | std::ios::binary);
@@ -124,6 +138,4 @@ int wmain() {
 	WaitForSingleObject(pi.hProcess, INFINITE);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
-
-	return 0;
 }
