@@ -17,7 +17,7 @@ Performs actions to ensure the student's vm has necessary users and file for the
 - Spawns the `dropper` with the threat actor user's credentials
 
 ### 2. Dropper
-Simulates the adversary's initial actions to obtain admin access:
+Simulates the adversary's recon and compromising of the admin account:
 - Locate the password document with a powershell command
 - Attempt to login to the administrator user's account using the passwords found to find valid credentials
 - Run the `elevate` with the admin's credentials
@@ -90,6 +90,9 @@ Read an executable file's bytes and place them into an array of bytes in a heade
 1. spawn listener from persistence
 1. inject a listener into a process and monitor host
 1. listener open socket
-1. (stretch) get logging to a single file working
+1. get logging to a single file working
 1. (stretch) hook TerminateProcess, ExitProcess
 1. (stretch) investigate having listener run netcat, potentially self inject
+1. (stretch) move to more dlls over exes
+1. (stretch) make defender evasion more reliable
+1. (stretch) fix GetUserAndContext

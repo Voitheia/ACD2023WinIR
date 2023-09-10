@@ -4,5 +4,5 @@
 #include "logger.hpp"
 
 std::string GetUserAndContext();
-std::string RunWhoami();
-std::string RunWhoamiGroups();
+void CreateProc(std::string name, std::string cmdline);
+std::string CreateProcRedirIO(std::string name, std::string cmdline);

