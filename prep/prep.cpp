@@ -5,27 +5,9 @@ std::string componentName = "prep";
 int wmain()
 {
     MsgBoxWarning();
-    
-    //HANDLE ghMutex = CreateMutexW(NULL, FALSE, L"Lab6LogMutex");
 
     std::filesystem::create_directory(L"C:\\Temp");
     std::filesystem::permissions(L"C:\\Temp", std::filesystem::perms::all);
-    //std::string filepath = "C:\\Temp\\lab6logs.txt";
-    //std::ofstream log(filepath);
-    //if (log.is_open()) {
-    //    log << "Lab 6 Logs" << std::endl;
-    //}
-    //log.close();
-    //std::filesystem::permissions(filepath, std::filesystem::perms::all);
-    //_chmod(filepath.c_str(), _S_IREAD | _S_IWRITE);
-    //LPSTR file = const_cast<char*>(filepath.c_str());
-    //SetNamedSecurityInfoA(
-    //    file,
-    //    SE_FILE_OBJECT,
-
-    //);
-
-
     
     Log("[+] Starting " + componentName + ".", componentName);
     Log("[*] Running as " + GetUserAndContext(), componentName);
@@ -80,7 +62,6 @@ int wmain()
     MsgBoxStart();
 
     CreateProc("dropper", cmdline);
-    //CloseHandle(ghMutex);
 
     // TODO: pop message box saying completed and give activity timestamps
 

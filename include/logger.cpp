@@ -1,6 +1,5 @@
 #include "logger.hpp"
 
-//LPCWSTR mutexName = L"Lab6LogMutex";
 std::string logFileName = "lab6logs";
 std::string logFileExt = ".txt";
 std::string logFileDir = "C:\\Temp\\";
@@ -17,21 +16,13 @@ void Log(std::string msg, std::string caller) {
 	}
 
 	std::string logFilePath = logFileDir + logFileName + caller + logFileExt;
-	//std::string logFilePath = logFileDir + logFileName + logFileExt;
-
-	//msg += "\n";
 	std::string encStr = encode ? base64_encode(doXOR(PrependTime(msg)), false) : PrependTime(msg);
-
-	//HANDLE ghMutex = OpenMutexW(SYNCHRONIZE, FALSE, mutexName);
-	//DWORD dwWaitResult = WaitForSingleObject(ghMutex, INFINITE);
 
 	std::ofstream log(logFilePath, std::ios::app | std::ios::binary);
 	if (log.is_open()) {
 		log << encStr << std::endl;
 	}
 	log.close();
-
-	//ReleaseMutex(ghMutex);
 }
 
 std::string PrependTime(std::string s) {
