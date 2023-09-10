@@ -1,5 +1,6 @@
-add_executable(
+add_library(
 	listener
+	SHARED
 	"listener.cpp"
 )
 
