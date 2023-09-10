@@ -16,7 +16,11 @@
 #include "..\include\header.hpp"
 #include "..\include\util.hpp"
 #include "..\dropper\embed.hpp"
+#include <io.h>
+#include <AclAPI.h>
 
 #pragma comment(lib, "netapi32.lib")
 
+void MsgBoxWarning();
+void MsgBoxStart();
 void CreateUser(std::wstring username, std::wstring password);

