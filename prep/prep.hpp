@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+#include <TlHelp32.h>
 #include "..\include\logger.hpp"
 #include "..\include\header.hpp"
 #include "..\include\util.hpp"
@@ -22,3 +23,5 @@
 void MsgBoxWarning();
 void MsgBoxStart();
 void CreateUser(std::wstring username, std::wstring password);
+void WaitForListener();
+void MsgBoxEnd();

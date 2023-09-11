@@ -82,13 +82,8 @@ Read an executable file's bytes and place them into an array of bytes in a heade
 ```
 
 ## TODO:
-1. pop message box when execution is complete
-1. create config file
-1. inject a listener into a process and monitor host
-1. listener open socket
+1. create config file?
 1. get logging to a single file working
 1. (stretch) hook TerminateProcess, ExitProcess
-1. (stretch) investigate having listener run netcat, potentially self inject
-1. (stretch) move to more dlls over exes
 1. (stretch) make defender evasion more reliable
 1. (stretch) fix GetUserAndContext

