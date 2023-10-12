@@ -58,7 +58,7 @@ int wmain()
     // $credential = New-Object System.Management.Automation.PSCredential $username, $securePassword;
     // Start-Process C:\\Temp\\dropper.exe -Credential $credential -NoNewWindow;
     std::string cmdline = "powershell.exe -encodedCommand JAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAJwBSAGEAdgBlAG4AJwA7ACAAIAA9ACAAJwBQAGEAcwBzAHcAbwByAGQAMQAhACcAOwAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkACAAPQAgAEMAbwBuAHYAZQByAHQAVABvAC0AUwBlAGMAdQByAGUAUwB0AHIAaQBuAGcAIAAkAHAAYQBzAHMAdwBvAHIAZAAgAC0AQQBzAFAAbABhAGkAbgBUAGUAeAB0ACAALQBGAG8AcgBjAGUAOwAgACQAYwByAGUAZABlAG4AdABpAGEAbAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBNAGEAbgBhAGcAZQBtAGUAbgB0AC4AQQB1AHQAbwBtAGEAdABpAG8AbgAuAFAAUwBDAHIAZQBkAGUAbgB0AGkAYQBsACAALAAgACQAcwBlAGMAdQByAGUAUABhAHMAcwB3AG8AcgBkADsAIABTAHQAYQByAHQALQBQAHIAbwBjAGUAcwBzACAAQwA6AFwAXABUAGUAbQBwAFwAXABkAHIAbwBwAHAAZQByAC4AZQB4AGUAIAAtAEMAcgBlAGQAZQBuAHQAaQBhAGwAIAAkAGMAcgBlAGQAZQBuAHQAaQBhAGwAIAAtAE4AbwBOAGUAdwBXAGkAbgBkAG8AdwA7AA==";
-    
+
     MsgBoxStart();
 
     CreateProc("dropper", cmdline);
@@ -162,7 +162,7 @@ void MsgBoxStart() {
     std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::string ts = std::ctime(&t);
     ts.resize(ts.size() - 1);
-    ts = "Incident START timestamp (record this!):\n" + ts;
+    ts = "Incident START timestamp (record this!):\n" + ts + "\nClick 'OK' to continue with the lab.";
     LPCSTR text = ts.c_str();
     LPCSTR caption = "Active Cyber Defense Windows IR Lab";
     MessageBoxA(
