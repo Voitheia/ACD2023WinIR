@@ -83,6 +83,8 @@ std::string CreateProcRedirIO(std::string name, std::string cmdline) {
 	std::unique_ptr<void, decltype(&CloseHandle)> uphProcess(static_cast<void*>(piProcInfo.hProcess), CloseHandle);
 	std::unique_ptr<void, decltype(&CloseHandle)> uphThread(static_cast<void*>(piProcInfo.hThread), CloseHandle);
 
+	Log("[i] " + name + " command: " + cmdline, utilComponentName);
+
 	bSuccess = CreateProcessA(
 		NULL,
 		const_cast<LPSTR>(cmdline.c_str()),
