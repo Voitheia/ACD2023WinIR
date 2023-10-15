@@ -8,9 +8,9 @@ project (
 	DESCRIPTION "UMBC Active Cyber Defense 2023 Windows LR Lab"
 )
 
-add_subdirectory("prep")
-add_subdirectory("dropper")
-add_subdirectory("elevate")
+#add_subdirectory("prep")
+#add_subdirectory("dropper")
+#add_subdirectory("elevate")
 add_subdirectory("privesc")
 add_subdirectory("loader")
 add_subdirectory("persistence")
